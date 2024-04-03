@@ -22,6 +22,9 @@ Apus <- R6::R6Class(
     #'@field fields (data.table) A table with the fields and their properties
     fields = NULL,
 
+    #'@field cultivations (data.table) A table with the properties of the cultivations
+    cultivations = NULL,
+
     #' @description
     #' Creates a new instance of this [R6][R6::R6Class] class.
     #'
