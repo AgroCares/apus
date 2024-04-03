@@ -7,6 +7,7 @@ apus <- apus::Apus$new(farm_name = farm_name)
 test_that("Apus is created", {
   expect_contains(class(apus), 'Apus')
   expect_equal(apus$farm_name, farm_name)
+  expect_identical(apus$cultivations, apus::cultivations)
 })
 
 
