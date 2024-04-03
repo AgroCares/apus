@@ -1,0 +1,18 @@
+Package: apus
+Type: Package
+Title: Advises an optimal fertilizer mix for a farm
+Version: 0.1.0
+Authors@R: c(
+    person(given = "Sven", 
+           family = "Verweij",
+           email = "sven.verweij@nmi-agro.nl",
+           role = c("aut","cre"),
+           comment = c(ORCID = '0000-0002-5573-3952')))
+Description: apus optimizes the fertilizer mix for a farm based on the nutrient 
+    requirements, legal norms, cultivation response curves, available fertilizers 
+    and tries to archieve the best economic result within the provided boundaries.
+License: GPL-3
+URL: https://github.com/AgroCares/apus
+BugReports: https://github.com/AgroCares/apus/issues
+Encoding: UTF-8
+LazyData: true
