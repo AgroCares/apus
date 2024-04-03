@@ -13,6 +13,8 @@ A farm needs to have fields, fertilizer etc
 \if{html}{\out{<div class="r6-fields">}}
 \describe{
 \item{\code{farm_name}}{(character) Name of the farm}
+
+\item{\code{fields}}{(data.table) A table with the fields and their properties}
 }
 \if{html}{\out{</div>}}
 }
@@ -20,6 +22,7 @@ A farm needs to have fields, fertilizer etc
 \subsection{Public methods}{
 \itemize{
 \item \href{#method-Apus-new}{\code{Apus$new()}}
+\item \href{#method-Apus-addField}{\code{Apus$addField()}}
 \item \href{#method-Apus-clone}{\code{Apus$clone()}}
 }
 }
@@ -36,6 +39,49 @@ Creates a new instance of this \link[R6:R6Class]{R6} class.
 \if{html}{\out{<div class="arguments">}}
 \describe{
 \item{\code{farm_name}}{(character) The name of the farm}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Apus-addField"></a>}}
+\if{latex}{\out{\hypertarget{method-Apus-addField}{}}}
+\subsection{Method \code{addField()}}{
+Add a field to the apus object
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Apus$addField(
+  b_id,
+  b_area,
+  b_lu,
+  d_n_req = NA,
+  d_p_req = NA,
+  d_k_req = NA,
+  d_n_norm = NA,
+  d_n_norm_man = NA,
+  d_p_norm = NA
+)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{b_id}}{(character) ID or (unique) name of the field}
+
+\item{\code{b_area}}{(number) The area of the field (m^2)}
+
+\item{\code{b_lu}}{(character) The cultivation code for this field}
+
+\item{\code{d_n_req}}{(number) The required amount of Nitrogen for this field (kg N / ha)}
+
+\item{\code{d_p_req}}{(number) The required amount of Phosphate for this field (kg P2O5 / ha)}
+
+\item{\code{d_k_req}}{(number) The required amount of Potassium for this field (kg K2O / ha)}
+
+\item{\code{d_n_norm}}{(number) The legal limit for workable Nitrogen (kg N / ha)}
+
+\item{\code{d_n_norm_man}}{(number) The legal limit for total Nitrogen from manure (kg N / ha}
+
+\item{\code{d_p_norm}}{(number) The legal limit for Phosphate (kg P2O5 / ha)}
 }
 \if{html}{\out{</div>}}
 }
