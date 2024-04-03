@@ -9,6 +9,7 @@ test_that("Apus is created", {
   expect_equal(apus$farm_name, farm_name)
   expect_identical(apus$cultivations, apus::cultivations)
   expect_identical(apus$fertilizers, apus::fertilizers)
+  expect_identical(apus$fines, apus::fines)
 })
 
 

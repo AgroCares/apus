@@ -15,3 +15,8 @@
 #'
 #' A data.table with the fertilizers available
 "fertilizers"
+
+#' Fines table
+#'
+#' A data.table with the fines available
+"fines"

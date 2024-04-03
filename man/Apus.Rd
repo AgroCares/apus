@@ -19,6 +19,8 @@ A farm needs to have fields, fertilizer etc
 \item{\code{cultivations}}{(data.table) A table with the properties of the cultivations}
 
 \item{\code{fertilizers}}{(data.table) A table with the properties of the fertilizers}
+
+\item{\code{fines}}{(data.table) A table with the properties of the fines}
 }
 \if{html}{\out{</div>}}
 }
