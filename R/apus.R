@@ -39,6 +39,10 @@ Apus <- R6::R6Class(
       # Assign farm name to object ----------------------------------------------
       self$farm_name <- farm_name
 
+
+      # Add default tables to object --------------------------------------------
+      self$cultivations <- apus::cultivations
+
       return(TRUE)
     },
 
