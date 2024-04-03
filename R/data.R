@@ -10,3 +10,8 @@
 #'   \item{b_lu_price}{The price of yielded cultivation per kg}
 #' }
 "cultivations"
+
+#' Fertilizers table
+#'
+#' A data.table with the fertilizers available
+"fertilizers"

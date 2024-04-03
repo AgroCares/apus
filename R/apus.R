@@ -25,6 +25,9 @@ Apus <- R6::R6Class(
     #'@field cultivations (data.table) A table with the properties of the cultivations
     cultivations = NULL,
 
+    #'@field fertilizers (data.table) A table with the properties of the fertilizers
+    fertilizers = NULL,
+
     #' @description
     #' Creates a new instance of this [R6][R6::R6Class] class.
     #'
@@ -42,6 +45,7 @@ Apus <- R6::R6Class(
 
       # Add default tables to object --------------------------------------------
       self$cultivations <- apus::cultivations
+      self$fertilizers <- apus::fertilizers
 
       return(TRUE)
     },
