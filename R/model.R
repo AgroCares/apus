@@ -1,52 +1,56 @@
-#' R6 Class Representing a model that can be used to optimize
+#' A torch model for apus
 #'
 #' @description
-#' A model has
+#' Creates a torch model to be used for apus
 #'
-#' @details
-#' A model requires
+#' @param farms (data.table)
+#' @param device (character)
 #'
-#' @importFrom R6 R6Class
 #' @import checkmate
 #' @import cli
 #' @import data.table
+#' @import torch
 #'
-#' @export
-ApusModel <- R6::R6Class(
-  "ApusModel",
-  public = list (
+#'@export
+createApusModel <- function(device) {
 
-    #' @field model (character) Name of the farm
-    model = NULL,
+  # Check arguments ---------------------------------------------------------
+  # TODO
 
-    #' @description
-    #' Creates a new instance of this [R6][R6::R6Class] class.
-    #'
-    #' @param cultivations (data.table) The list of cultivations available to train the model for. Should have similiar structure
-    #' @param fertilizers (data.table)
-    #' @param fines (data.table)
-    #'
-    #' @export
-    initialize = function(cultivations = apus::cultivations, fertilizers = apus::fertilizers, fines = apus::fines) {
+  # Define torch dataset ----------------------------------------------------
+  apus_model <- torch::nn(
+    name = "apus_dataset",
 
-      # Check arguments ------------------------------------------------------
-      checkmate::assertDataTable(cultivations, col.names = colnames(apus::cultivations))
-      checkmate::assertDataTable(fertilizers, col.names = colnames(apus::fertilizers))
-      checkmate::assertDataTable(fines, col.names = colnames(apus::fines))
+    initialize = function(dim_start, width, dim_end, depth, device) {
 
-      return(TRUE)
-    },
-
-    #' @description
-    #' Train an apus model
-    #'
-    #' @export
-    trainModel = function() {
-
-      # Check arguments ---------------------------------------------------------
+      # Check arguments -----------------------------------------------------
       # TODO
 
-      return(TRUE)
+
+      # Setup the layers --------------------------------------------------------
+      self$fc_in <- torch::nn_linear(in_features = dim_start, out_features = width)
+      self$fc <- torch::nn_linear(width, width)
+      self$fc_out <- torch::nn_linear(in_features = width, out_features = dim_end)
+
+      self$activation <- torch::nn_prelu()
+      self$activation_end <- torch::nn_relu()
+
+
+    },
+
+    forward = function (farms) {
+
+      x <- self$fc_in(farms)
+      y <- self$fc(x)
+      z <- self$fc_end(y)
+
+      return(z)
     }
   )
-)
+
+  # Create torch dataset for apus -------------------------------------------
+  model <- apus_model()
+
+  return(dataset)
+}
+

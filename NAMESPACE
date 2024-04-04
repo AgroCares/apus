@@ -2,6 +2,7 @@
 
 export(Apus)
 export(createApusDataset)
+export(createApusModel)
 import(checkmate)
 import(cli)
 import(data.table)
