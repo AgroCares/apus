@@ -24,4 +24,4 @@
 #' Parameters table
 #'
 #' A data.table with the parameters used in this package and their definition
-"fines"
+"parameters"
