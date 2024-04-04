@@ -6,17 +6,11 @@
 \title{Fines table}
 \format{
 An object of class \code{data.table} (inherits from \code{data.frame}) with 3 rows and 2 columns.
-
-An object of class \code{data.table} (inherits from \code{data.frame}) with 3 rows and 2 columns.
 }
 \usage{
-fines
-
 fines
 }
 \description{
 A data.table with the fines available
-
-A data.table with the parameters used in this package and their definition
 }
 \keyword{datasets}
