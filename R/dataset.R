@@ -42,6 +42,11 @@ createApusDataset <- function(fields = NULL, device) {
       } else {
         # self$fields <- NULL
       }
+
+      fertilizers[, P_ID := 1:.N]
+      fertilizers <- fertilizers[, c('P_ID', 'P_N_RT', 'P_N_WC', 'P_P_RT')]
+      self$fertilizers <- torch::torch_tensor(as.matrix(fertilizers), device = device)
+
     },
 
     .getitem = function(index) {
@@ -54,7 +59,7 @@ createApusDataset <- function(fields = NULL, device) {
         t.fields <- transformFieldsToTensor(fields, self$device)
       }
 
-      return(list(fields = t.fields))
+      return(list(fields = t.fields, fertilizers = self$fertilizers))
     },
 
     .length = function() {
