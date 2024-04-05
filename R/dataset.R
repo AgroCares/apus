@@ -3,7 +3,7 @@
 #' @description
 #' Creates a torch dateset to be used for apus model
 #'
-#' @param farms (data.table)
+#' @param fields (data.table)
 #' @param device (character)
 #'
 #' @import checkmate
@@ -12,9 +12,9 @@
 #' @import torch
 #'
 #'@export
-createApusDataset <- function(farms = NULL, device) {
+createApusDataset <- function(fields = NULL, device) {
 
-  transformFarmsToTensor = createSyntheticFarms = code = farms_count = self = size = value_max = value_min = NULL
+  transformfieldsToTensor = createSyntheticfields = code = fields_count = self = size = value_max = value_min = NULL
 
   # Check arguments ---------------------------------------------------------
   # TODO
@@ -28,7 +28,7 @@ createApusDataset <- function(farms = NULL, device) {
   apus_dataset <- torch::dataset(
     name = "apus_dataset",
 
-    initialize = function(farms = NULL, cultivations = apus::cultivations, fertilizers = apus::fertilizers, fields_max, device) {
+    initialize = function(fields = NULL, cultivations = apus::cultivations, fertilizers = apus::fertilizers, fields_max, device) {
 
       # Check arguments -----------------------------------------------------
       # TODO
@@ -37,75 +37,67 @@ createApusDataset <- function(farms = NULL, device) {
       # Store the data ------------------------------------------------------
       self$fields_max <- fields_max
       self$device <- device
-      if (length(farms) >0 ) {
-        self$farms <- transformFarmsToTensor(farms, device = device)
-        self$farms_count <- uniqueN(farms$b_id_farm)
+      if (length(fields) >0 ) {
+        self$fields <- transformFieldsToTensor(fields, device = device)
       } else {
-        # self$farms <- NULL
-        self$farms_count <- 10
+        # self$fields <- NULL
       }
     },
 
     .getitem = function(index) {
 
-      if (length(farms) == 0) {
-        farms <- createSyntheticFarms(self$farms_count, self$fields_max, self$cultivations, apus::parameters)
-        t.farms <- transformFarmsToTensor(farms, self$device)
+      if (length(self$fields) == 0) {
+        fields <- createSyntheticFields(self$fields_max, self$cultivations, apus::parameters)
+        t.fields <- transformFieldsToTensor(fields, self$device)
       } else {
-        t.farms <- self$farms[index]
+        fields <- self$fields[b_id_field == index, ]
+        t.fields <- transformFieldsToTensor(fields, self$device)
       }
 
-      return(list(farms = t.farms))
+      return(list(fields = t.fields))
     },
 
     .length = function() {
-      self$farms_count
+      self$fields_max
     }
   )
 
 
   # Create torch dataset for apus -------------------------------------------
-  dataset <- apus_dataset(farms = NULL, cultivations = apus::cultivations, fertilizers = apus::fertilizers, fields_max, device)
+  dataset <- apus_dataset(fields = NULL, cultivations = apus::cultivations, fertilizers = apus::fertilizers, fields_max, device)
 
   return(dataset)
 }
 
 
-transformFarmsToTensor = function(farms, device) {
+transformFieldsToTensor = function(fields, device) {
 
   # Select only relevant columns and define column order --------------------
-  col.farms <- c('b_id_farm', 'b_id_field', 'b_area', 'd_n_req', 'd_p_req', 'd_k_req', 'd_n_norm', 'd_n_norm_man', 'd_p_norm')
-  farms <- farms[, mget(col.farms)]
-
-  # Convert farms to array with dimension: [farm, field, parameter] ---------
-  ar.farms <- split(farms, by = 'b_id_farm')
-  ar.farms  <- abind::abind(ar.farms , along = 3)
-  ar.farms  <- aperm(ar.farms, c(3,1,2))
+  col.fields <- c('b_id_field', 'b_area', 'd_n_req', 'd_p_req', 'd_k_req', 'd_n_norm', 'd_n_norm_man', 'd_p_norm')
+  fields <- fields[, mget(col.fields)]
 
 
   # Create torch_tensor from array ------------------------------------------
-  t.tensor <- torch::torch_tensor(ar.farms, device = 'cpu')
+  t.tensor <- torch::torch_tensor(as.matrix(fields), device = device)
 
 
   return(t.tensor)
 }
 
-createSyntheticFarms = function (farms_count, fields_max, cultivations, parameters) {
+createSyntheticFields = function (fields_max, cultivations, parameters) {
 
-  size <- farms_count * fields_max
-  farms <- data.table(
-    b_id_farm = rep(1:farms_count, each = fields_max),
-    b_id_field = rep(1:fields_max, times = farms_count),
-    # b_lu = sample(x = cultivations$b_lu, size = size, replace = TRUE),
-    b_area = stats::runif(n = size, min = parameters[code == 'b_area', value_min], max = parameters[code == 'b_area', value_max]),
-    d_n_req =  stats::runif(n = size, min = parameters[code == 'd_n_req', value_min], max = parameters[code == 'd_n_req', value_max]),
-    d_p_req = stats::runif(n = size, min = parameters[code == 'd_p_req', value_min], max = parameters[code == 'd_p_req', value_max]),
-    d_k_req = stats::runif(n = size, min = parameters[code == 'd_k_req', value_min], max = parameters[code == 'd_k_req', value_max]),
-    d_n_norm = stats::runif(n = size, min = parameters[code == 'd_n_norm', value_min], max = parameters[code == 'd_n_norm', value_max]),
-    d_n_norm_man = stats::runif(n = size, min = parameters[code == 'd_n_norm_man', value_min], max = parameters[code == 'd_n_norm_man', value_max]),
-    d_p_norm = stats::runif(n = size, min = parameters[code == 'd_p_norm', value_min], max = parameters[code == 'd_p_norm', value_max])
+  fields <- data.table(
+    b_id_field = 1:fields_max,
+    # b_lu = sample(x = cultivations$b_lu, fields_max = fields_max, replace = TRUE),
+    b_area = stats::runif(n = fields_max, min = parameters[code == 'b_area', value_min], max = parameters[code == 'b_area', value_max]),
+    d_n_req =  stats::runif(n = fields_max, min = parameters[code == 'd_n_req', value_min], max = parameters[code == 'd_n_req', value_max]),
+    d_p_req = stats::runif(n = fields_max, min = parameters[code == 'd_p_req', value_min], max = parameters[code == 'd_p_req', value_max]),
+    d_k_req = stats::runif(n = fields_max, min = parameters[code == 'd_k_req', value_min], max = parameters[code == 'd_k_req', value_max]),
+    d_n_norm = stats::runif(n = fields_max, min = parameters[code == 'd_n_norm', value_min], max = parameters[code == 'd_n_norm', value_max]),
+    d_n_norm_man = stats::runif(n = fields_max, min = parameters[code == 'd_n_norm_man', value_min], max = parameters[code == 'd_n_norm_man', value_max]),
+    d_p_norm = stats::runif(n = fields_max, min = parameters[code == 'd_p_norm', value_min], max = parameters[code == 'd_p_norm', value_max])
   )
 
-  return(farms)
+  return(fields)
 }
 

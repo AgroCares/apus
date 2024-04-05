@@ -4,10 +4,10 @@
 \alias{createApusDataset}
 \title{A torch dataset for apus}
 \usage{
-createApusDataset(farms = NULL, device)
+createApusDataset(fields = NULL, device)
 }
 \arguments{
-\item{farms}{(data.table)}
+\item{fields}{(data.table)}
 
 \item{device}{(character)}
 }
