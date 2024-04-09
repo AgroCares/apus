@@ -57,7 +57,6 @@ createApusModel <- function(dataset, width = 12, layers = 1, epochs = 100, devic
       x.fields <- self$activation(x.fields)
       # print(dim(x.fields))
 
-      fertilizers <- b$fertilizers
       x.fertilizers <- fertilizers$flatten(start_dim = 2)
       # dim(x.fertilizers)
       x.fertilizers <- x.fertilizers$reshape(c(dim(fertilizers)[1], 1, self$fertilizers_parameters_count * self$fertilizers_count))
