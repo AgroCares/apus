@@ -34,6 +34,10 @@ Apus <- R6::R6Class(
     #'@field model (nn_module) The model to use for optimization of fertilizer choice
     model = NULL,
 
+    #'@field device (character) Whether to run the model on `cpu` or `cuda`
+    device = 'cpu',
+
+
     #' @description
     #' Creates a new instance of this [R6][R6::R6Class] class.
     #'
@@ -60,7 +64,7 @@ Apus <- R6::R6Class(
     #' @description
     #' Add a field to the apus object
     #'
-    #' @param b_id (character) ID or (unique) name of the field
+    #' @param b_id_field (character) ID or (unique) name of the field
     #' @param b_area (number) The area of the field (m^2)
     #' @param b_lu (character) The cultivation code for this field
     #' @param d_n_req (number) The required amount of Nitrogen for this field (kg N / ha)
@@ -71,14 +75,14 @@ Apus <- R6::R6Class(
     #' @param d_p_norm (number) The legal limit for Phosphate (kg P2O5 / ha)
     #'
     #' @export
-    addField = function(b_id, b_area, b_lu, d_n_req = NA, d_p_req = NA, d_k_req = NA, d_n_norm = NA, d_n_norm_man = NA, d_p_norm = NA) {
+    addField = function(b_id_field, b_area, b_lu, d_n_req = NA, d_p_req = NA, d_k_req = NA, d_n_norm = NA, d_n_norm_man = NA, d_p_norm = NA) {
 
       # Check arguments ---------------------------------------------------------
       # TODO
 
       # Create table with the data ----------------------------------------------
       field <- data.table(
-        b_id = b_id,
+        b_id_field = b_id_field,
         b_area = b_area,
         b_lu = b_lu,
         d_n_req = d_n_req,
@@ -91,13 +95,13 @@ Apus <- R6::R6Class(
 
       # Append field to fields --------------------------------------------------
       if (length(self$fields) == 0) {
-        setkey(field, b_id)
+        setkey(field, b_id_field)
         self$fields <- field
       } else {
 
-        # Check if b_id is not already used ----------------------------------------
-        if (b_id %in% self$fields$b_id) {
-          cli_abort('The field {b_id} is already present and duplicate fields are not allowed.')
+        # Check if b_id_field is not already used ----------------------------------------
+        if (b_id_field %in% self$fields$b_id_field) {
+          cli_abort('The field {b_id_field} is already present and duplicate fields are not allowed.')
         }
 
         self$fields <- rbindlist(list(self$fields, field))
@@ -112,7 +116,7 @@ Apus <- R6::R6Class(
     #' @param width (integer)
     #' @param layers (integer)
     #' @param epochs (integer)
-    #' @param device (characer)
+    #' @param device (character)
     #'
     #' @export
     trainModel = function(width = 12, layers = 1, epochs = 3, device = 'cpu') {
@@ -131,7 +135,7 @@ Apus <- R6::R6Class(
       } else {
         device <- 'cpu'
       }
-
+      self$device <- device
 
       # Create an Apus dataset --------------------------------------------------
       dataset <- createApusDataset(fields = NULL, device = device)
@@ -143,6 +147,41 @@ Apus <- R6::R6Class(
       self$model <- model
 
       return(TRUE)
+    },
+
+    #' @description
+    #' Optimize fertilizer choice
+    #'
+    #' @export
+    optimizeFertilizerChoice = function() {
+
+      # Check arguments ---------------------------------------------------------
+      if (length(self$model) == 0) {
+        cli::cli_abort('No model available currently. Please create a model first with the function `trainModel`')
+      }
+
+
+      # Create dataset ----------------------------------------------------------
+      fields <- apus$fields
+      device <- 'cpu'
+
+      dataset <- createApusDataset(fields = fields, device = device)
+      dl <- torch::dataloader(dataset, batch_size = 1)
+
+      # Predict optimal fertilizer choice ---------------------------------------
+      batch <- dl$.iter()
+      batch <- batch$.next()
+      doses <- apus$model(batch$fields, batch$fertilizers)
+
+
+      # Format to output --------------------------------------------------------
+      dt <- data.table::as.data.table(as.array(doses)[1,,])
+      colnames(dt) <- self$fertilizers$P_NAME_NL
+      dt <- dt[, lapply(.SD, round)]
+      dt[, b_id_field := self$fields$b_id_field]
+      data.table::setcolorder(dt, 'b_id_field')
+
+      return(dt)
     }
   )
 )

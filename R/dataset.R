@@ -22,7 +22,7 @@ createApusDataset <- function(fields = NULL, device) {
 
 
   # Settings ----------------------------------------------------------------
-  fields_max <- 5
+  fields_max <- 3
 
 
   # Define torch dataset ----------------------------------------------------
@@ -39,11 +39,11 @@ createApusDataset <- function(fields = NULL, device) {
 
       self$fields_max <- fields_max
       self$device <- device
-      if (length(fields) >0 ) {
+      if (length(fields) > 0 ) {
         self$fields <- transformFieldsToTensor(fields, device = device)
-        self$farms_count <- NA # TODO
+        self$farms_count <- 1
       } else {
-        # self$fields <- NULL
+        self$fields <- NULL
         self$farms_count <- 100
       }
 
@@ -62,8 +62,7 @@ createApusDataset <- function(fields = NULL, device) {
         fields <- createSyntheticFields(self$fields_max, self$cultivations, apus::parameters)
         t.fields <- transformFieldsToTensor(fields, self$device)
       } else {
-        fields <- self$fields[b_id_field == index, ]
-        t.fields <- transformFieldsToTensor(fields, self$device)
+        t.fields <- self$fields #[b_id_field == index, ]
       }
 
       return(list(fields = t.fields, fertilizers = self$fertilizers))
@@ -76,7 +75,7 @@ createApusDataset <- function(fields = NULL, device) {
 
 
   # Create torch dataset for apus -------------------------------------------
-  dataset <- apus_dataset(fields = NULL, cultivations = apus::cultivations, fertilizers = apus::fertilizers, fields_max, device)
+  dataset <- apus_dataset(fields = fields, cultivations = apus::cultivations, fertilizers = apus::fertilizers, fields_max, device)
 
   return(dataset)
 }
@@ -85,7 +84,7 @@ createApusDataset <- function(fields = NULL, device) {
 transformFieldsToTensor = function(fields, device) {
 
   # Select only relevant columns and define column order --------------------
-  col.fields <- c('b_id_field', 'b_area', 'd_n_req', 'd_p_req', 'd_k_req', 'd_n_norm', 'd_n_norm_man', 'd_p_norm')
+  col.fields <- c('b_area', 'd_n_req', 'd_p_req', 'd_k_req', 'd_n_norm', 'd_n_norm_man', 'd_p_norm')
   fields <- fields[, mget(col.fields)]
 
 
