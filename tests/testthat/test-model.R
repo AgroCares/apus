@@ -2,7 +2,7 @@
 # Test creating model and forward pass ------------------------------------
 
 dataset <- apus::createApusDataset(fields = NULL, device = 'cpu')
-model <- createApusModel(dataset, device = 'cpu')
+model <- createApusModel(dataset, device = 'cpu', epochs = 2)
 dl <- torch::dataloader(dataset, batch_size = 1)
 
 batch <- dl$.iter()
@@ -15,7 +15,7 @@ test_that("Create model and run a forward pass", {
 
   expect_contains(class(model), 'nn_module')
   expect_contains(class(doses), 'torch_tensor')
-  expect_equal(dim(doses), c(dataset$fields_max, nrow(dataset$fertilizers)))
+  expect_equal(dim(doses), c(1, dataset$fields_max, nrow(dataset$fertilizers)))
 
   # Do not allow negative dose advice
   expect_gte(min(as.matrix(doses)), 0)

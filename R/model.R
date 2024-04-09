@@ -14,7 +14,7 @@
 #' @import torch
 #'
 #'@export
-createApusModel <- function(dataset, width = 12, depth = 1, device) {
+createApusModel <- function(dataset, width = 12, depth = 1, epochs = 100, device) {
 
   self = NULL
 
@@ -89,21 +89,21 @@ createApusModel <- function(dataset, width = 12, depth = 1, device) {
 
   # Create torch model for apus -------------------------------------------
   model <- apus_model(dataset, width, depth, device)
-  optimizer <- torch::optim_sgd(model$parameters, lr = 0.01)
+  optimizer <- torch::optim_adam(model$parameters, lr = 0.001)
   dl <- torch::dataloader(dataset, batch_size = 1)
 
 
 
   # Train the model ---------------------------------------------------------
-  for (epoch in 1:10) {
+  for (epoch in 1:epochs) {
 
     # Training loop
     losses.train <- c()
     coro::loop(for (b in dl) {
 
       # For testing
-      b <- dl$.iter()
-      b <- b$.next()
+      # b <- dl$.iter()
+      # b <- b$.next()
 
       # Forward pass
       optimizer$zero_grad()
@@ -111,7 +111,7 @@ createApusModel <- function(dataset, width = 12, depth = 1, device) {
       cost <- calculateCost(doses, b$fields, b$fertilizers)
 
       # Backward pass
-      loss$backward()
+      cost$backward()
       optimizer$step()
 
       losses.train <- c(losses.train, cost$item())
@@ -123,7 +123,6 @@ createApusModel <- function(dataset, width = 12, depth = 1, device) {
     # Validation loop
 
   }
-
 
   return(model)
 }
@@ -141,7 +140,7 @@ calculateCost <- function(doses, fields, fertilizers, sum_batches = TRUE) {
 
 
   # Combine the modules -----------------------------------------------------
-  cost <- torch::torch_zeros(dim(doses)[1]) - module1
+  cost <- torch::torch_zeros(dim(doses)[1]) + module1
 
 
   # Reduce batches to single value ------------------------------------------

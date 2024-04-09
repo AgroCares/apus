@@ -44,7 +44,7 @@ createApusDataset <- function(fields = NULL, device) {
         self$farms_count <- NA # TODO
       } else {
         # self$fields <- NULL
-        self$farms_count <- 1E6L
+        self$farms_count <- 100
       }
 
       # Set temporary
