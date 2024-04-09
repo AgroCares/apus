@@ -43,9 +43,19 @@ createApusDataset <- function(fields = NULL, device) {
         # self$fields <- NULL
       }
 
-      fertilizers[, P_ID := 1:.N]
-      fertilizers <- fertilizers[, c('P_ID', 'P_N_RT', 'P_N_WC', 'P_P_RT')]
+      # Set temporary
+      fertilizers[, P_STORED := 0]
+      fertilizers[, P_PRICE := 1]
+
+      fertilizers <- fertilizers[, c('P_STORED', 'P_PRICE')]
+
       self$fertilizers <- torch::torch_tensor(as.matrix(fertilizers), device = device)
+
+      hoi <-  torch::torch_tensor(as.matrix(fertilizers))
+
+      hoi2 <- hoi$flatten()
+      hoi3 <- hoi2$reshape(c(1,94))
+      hoi3$repeat_interleave(5L, dim = 1)
 
     },
 
@@ -89,7 +99,7 @@ transformFieldsToTensor = function(fields, device) {
   return(t.tensor)
 }
 
-createSyntheticFields = function (fields_max, cultivations, parameters) {
+createSyntheticFields = function (fields_max, cultivations = apus::cultivations, parameters = apus::parameters) {
 
   fields <- data.table(
     b_id_field = 1:fields_max,

@@ -4,12 +4,16 @@
 \alias{createApusModel}
 \title{A torch model for apus}
 \usage{
-createApusModel(device)
+createApusModel(dataset, width = 12, depth = 1, device)
 }
 \arguments{
-\item{device}{(character)}
+\item{dataset}{(ApusDataset)}
 
-\item{farms}{(data.table)}
+\item{width}{(integer)}
+
+\item{depth}{(integer)}
+
+\item{device}{(character)}
 }
 \description{
 Creates a torch model to be used for apus
