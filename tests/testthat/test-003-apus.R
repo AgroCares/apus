@@ -92,3 +92,11 @@ test_that("Second field is added", {
 })
 
 
+# Train a model -----------------------------------------------------------
+
+apus$trainModel()
+
+test_that("Model is trained and available", {
+  expect_contains(class(apus$model), 'nn_module')
+})
+
