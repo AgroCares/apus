@@ -31,6 +31,9 @@ Apus <- R6::R6Class(
     #'@field fines (data.table) A table with the properties of the fines
     fines = NULL,
 
+    #'@field model (nn_module) The model to use for optimization of fertilizer choice
+    model = NULL,
+
     #' @description
     #' Creates a new instance of this [R6][R6::R6Class] class.
     #'
@@ -99,6 +102,45 @@ Apus <- R6::R6Class(
 
         self$fields <- rbindlist(list(self$fields, field))
       }
+
+      return(TRUE)
+    },
+
+    #' @description
+    #' Train a model
+    #'
+    #' @param width (integer)
+    #' @param layers (integer)
+    #' @param epochs (integer)
+    #' @param device (characer)
+    #'
+    #' @export
+    trainModel = function(width = 12, layers = 1, epochs = 3, device = 'cpu') {
+
+      # Check arguments ---------------------------------------------------------
+      # TODO
+
+
+      # Select device -----------------------------------------------------------
+      if (device == 'cuda' & torch::cuda_is_available()){
+        device <- 'cuda'
+        cli::cli_alert_info('Apus model will run on  GPU')
+      } else if  (device == 'cuda' & ! torch::cuda_is_available()) {
+        device <- 'cpu'
+        cli::cli_alert_warning('cuda is not available. Apus model will therefore run on CPU instead of GPU')
+      } else {
+        device <- 'cpu'
+      }
+
+
+      # Create an Apus dataset --------------------------------------------------
+      dataset <- createApusDataset(fields = NULL, device = device)
+
+
+      # Create an Apus model ----------------------------------------------------------
+      model <- createApusModel(dataset, width = width, layers = layers, epochs = epochs, device = device)
+
+      self$model <- model
 
       return(TRUE)
     }

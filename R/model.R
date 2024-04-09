@@ -5,7 +5,7 @@
 #'
 #' @param dataset (ApusDataset) Dataset created with createApusDataset
 #' @param width (integer)
-#' @param depth (integer)
+#' @param layers (integer)
 #' @param device (character)
 #'
 #' @import checkmate
@@ -14,7 +14,7 @@
 #' @import torch
 #'
 #'@export
-createApusModel <- function(dataset, width = 12, depth = 1, epochs = 100, device) {
+createApusModel <- function(dataset, width = 12, layers = 1, epochs = 100, device) {
 
   self = NULL
 
@@ -25,7 +25,7 @@ createApusModel <- function(dataset, width = 12, depth = 1, epochs = 100, device
   apus_model <- torch::nn_module(
     name = "apus_model",
 
-    initialize = function(dataset, width, depth, device) {
+    initialize = function(dataset, width, layers, device) {
 
       # Check arguments -----------------------------------------------------
       # TODO
@@ -88,7 +88,7 @@ createApusModel <- function(dataset, width = 12, depth = 1, epochs = 100, device
   )
 
   # Create torch model for apus -------------------------------------------
-  model <- apus_model(dataset, width, depth, device)
+  model <- apus_model(dataset, width, layers, device)
   optimizer <- torch::optim_adam(model$parameters, lr = 0.001)
   dl <- torch::dataloader(dataset, batch_size = 1)
 
