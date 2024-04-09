@@ -57,16 +57,19 @@ createApusModel <- function(dataset, width = 12, depth = 1, device) {
       x.fields <- self$activation(x.fields)
       # print(dim(x.fields))
 
-      x.fertilizers <- fertilizers$flatten()
-      x.fertilizers <- x.fertilizers$reshape(c(1, self$fertilizers_parameters_count * self$fertilizers_count))
-      x.fertilizers <- x.fertilizers$repeat_interleave(self$fields_count, dim = 1)
+      fertilizers <- b$fertilizers
+      x.fertilizers <- fertilizers$flatten(start_dim = 2)
+      # dim(x.fertilizers)
+      x.fertilizers <- x.fertilizers$reshape(c(dim(fertilizers)[1], 1, self$fertilizers_parameters_count * self$fertilizers_count))
+      # print(dim(x.fertilizers))
+      x.fertilizers <- x.fertilizers$repeat_interleave(self$fields_count, dim = 2)
       # print(dim(x.fertilizers))
 
       x.fertilizers <- self$fc_in_fertilizers(x.fertilizers)
       x.fertilizers <- self$activation(x.fertilizers)
       # print(dim(x.fertilizers))
 
-      x <- torch::torch_cat(list(x.fields, x.fertilizers), dim = 2L)
+      x <- torch::torch_cat(list(x.fields, x.fertilizers), dim = 3L)
       # print(dim(x))
       y <- self$fc_cat(x)
       # print(dim(y))
@@ -84,18 +87,48 @@ createApusModel <- function(dataset, width = 12, depth = 1, device) {
     }
   )
 
-  # Create torch dataset for apus -------------------------------------------
+  # Create torch model for apus -------------------------------------------
   model <- apus_model(dataset, width, depth, device)
+  optimizer <- torch::optim_sgd(model$parameters, lr = 0.01)
+  dl <- torch::dataloader(dataset, batch_size = 1)
+
 
 
   # Train the model ---------------------------------------------------------
+  for (epoch in 1:10) {
 
+    # Training loop
+    losses.train <- c()
+    coro::loop(for (b in dl) {
+
+      # For testing
+      b <- dl$.iter()
+      b <- b$.next()
+
+      # Forward pass
+      optimizer$zero_grad()
+      doses <- model(b$fields, b$fertilizers)
+      cost <- calculateCost(doses, b$fields, b$fertilizers)
+
+      # Backward pass
+      loss$backward()
+      optimizer$step()
+
+      losses.train <- c(losses.train, cost$item())
+
+    })
+
+    cat(sprintf("Loss at epoch %d: %3f\n", epoch, mean(losses.train)))
+
+    # Validation loop
+
+  }
 
 
   return(model)
 }
 
-calculateCost <- function(doses, fields, fertilizers) {
+calculateCost <- function(doses, fields, fertilizers, sum_batches = TRUE) {
 
 
   # Check arguments ---------------------------------------------------------
@@ -108,7 +141,13 @@ calculateCost <- function(doses, fields, fertilizers) {
 
 
   # Combine the modules -----------------------------------------------------
-  cost <- torch::torch_zeros(1L) - module1
+  cost <- torch::torch_zeros(dim(doses)[1]) - module1
+
+
+  # Reduce batches to single value ------------------------------------------
+  if (sum_batches) {
+    cost <- torch::torch_sum(cost)
+  }
 
   return(cost)
 }
@@ -117,16 +156,16 @@ calculateCost <- function(doses, fields, fertilizers) {
 calculateCostModule1 <- function(doses, fertilizers) {
 
   # Sum dose per fertilizer -------------------------------------------------
-  fertilizers.dose <- torch::torch_sum(doses, dim = 1L)
+  fertilizers.dose <- torch::torch_sum(doses, dim = 2L)
 
 
   # Calculate cost per fertilizer -------------------------------------------
-  fertilizers.price <- fertilizers[, 2]
+  fertilizers.price <- fertilizers[,,2]
   fertilzers.cost <- fertilizers.dose * fertilizers.price
 
 
   # Sum cost for farm -------------------------------------------------------
-  module1 <- torch::torch_sum(fertilzers.cost)
+  module1 <- torch::torch_sum(fertilzers.cost, dim = 2L)
 
 
   return(module1)

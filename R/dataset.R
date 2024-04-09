@@ -36,12 +36,15 @@ createApusDataset <- function(fields = NULL, device) {
 
 
       # Store the data ------------------------------------------------------
+
       self$fields_max <- fields_max
       self$device <- device
       if (length(fields) >0 ) {
         self$fields <- transformFieldsToTensor(fields, device = device)
+        self$farms_count <- NA # TODO
       } else {
         # self$fields <- NULL
+        self$farms_count <- 1E6L
       }
 
       # Set temporary
@@ -67,7 +70,7 @@ createApusDataset <- function(fields = NULL, device) {
     },
 
     .length = function() {
-      self$fields_max
+      self$farms_count
     }
   )
 

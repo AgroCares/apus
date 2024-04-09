@@ -1,11 +1,12 @@
 
 # Test creating model and forward pass ------------------------------------
 
-
 dataset <- apus::createApusDataset(fields = NULL, device = 'cpu')
 model <- createApusModel(dataset, device = 'cpu')
+dl <- torch::dataloader(dataset, batch_size = 1)
 
-batch <- dataset$.getitem(1)
+batch <- dl$.iter()
+batch <- batch$.next()
 fields <- batch$fields
 fertilizers <- batch$fertilizers
 doses <- model(fields, fertilizers)
@@ -19,7 +20,6 @@ test_that("Create model and run a forward pass", {
   # Do not allow negative dose advice
   expect_gte(min(as.matrix(doses)), 0)
 })
-
 
 # Test cost functions of modules ------------------------------------------
 
