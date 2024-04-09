@@ -95,3 +95,39 @@ createApusModel <- function(dataset, width = 12, depth = 1, device) {
   return(model)
 }
 
+calculateCost <- function(doses, fields, fertilizers) {
+
+
+  # Check arguments ---------------------------------------------------------
+  # TODO
+
+
+  # Module 1: Purchase of fertilizers ---------------------------------------
+  module1 <- calculateCostModule1(doses, fertilizers)
+
+
+
+  # Combine the modules -----------------------------------------------------
+  cost <- torch::torch_zeros(1L) - module1
+
+  return(cost)
+}
+
+# Module 1: Purchase of fertilizers ---------------------------------------
+calculateCostModule1 <- function(doses, fertilizers) {
+
+  # Sum dose per fertilizer -------------------------------------------------
+  fertilizers.dose <- torch::torch_sum(doses, dim = 1L)
+
+
+  # Calculate cost per fertilizer -------------------------------------------
+  fertilizers.price <- fertilizers[, 2]
+  fertilzers.cost <- fertilizers.dose * fertilizers.price
+
+
+  # Sum cost for farm -------------------------------------------------------
+  module1 <- torch::torch_sum(fertilzers.cost)
+
+
+  return(module1)
+}
