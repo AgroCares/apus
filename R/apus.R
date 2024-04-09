@@ -162,11 +162,9 @@ Apus <- R6::R6Class(
 
 
       # Create dataset ----------------------------------------------------------
-      fields <- apus$fields
-      device <- 'cpu'
-
-      dataset <- createApusDataset(fields = fields, device = device)
+      dataset <- createApusDataset(fields = self$fields, device = self$device)
       dl <- torch::dataloader(dataset, batch_size = 1)
+
 
       # Predict optimal fertilizer choice ---------------------------------------
       batch <- dl$.iter()
