@@ -14,7 +14,8 @@
 #'@export
 createApusDataset <- function(fields = NULL, device) {
 
-  transformfieldsToTensor = createSyntheticfields = code = fields_count = self = size = value_max = value_min = NULL
+  transformfieldsToTensor = createSyntheticfields = code = fields_count = self = NULL
+  size = value_max = value_min = P_PRICE = P_STORED = b_id_field = NULL
 
   # Check arguments ---------------------------------------------------------
   # TODO
@@ -44,19 +45,12 @@ createApusDataset <- function(fields = NULL, device) {
       }
 
       # Set temporary
-      fertilizers[, P_STORED := 0]
-      fertilizers[, P_PRICE := 1]
+      fertilizers[, p_stored := 0]
+      fertilizers[, p_price := 1]
 
-      fertilizers <- fertilizers[, c('P_STORED', 'P_PRICE')]
+      fertilizers <- fertilizers[, c('p_stored', 'p_price')]
 
       self$fertilizers <- torch::torch_tensor(as.matrix(fertilizers), device = device)
-
-      hoi <-  torch::torch_tensor(as.matrix(fertilizers))
-
-      hoi2 <- hoi$flatten()
-      hoi3 <- hoi2$reshape(c(1,94))
-      hoi3$repeat_interleave(5L, dim = 1)
-
     },
 
     .getitem = function(index) {
@@ -100,6 +94,8 @@ transformFieldsToTensor = function(fields, device) {
 }
 
 createSyntheticFields = function (fields_max, cultivations = apus::cultivations, parameters = apus::parameters) {
+
+  code = value_min = value_max = NULL
 
   fields <- data.table(
     b_id_field = 1:fields_max,

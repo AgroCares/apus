@@ -16,6 +16,8 @@
 #'@export
 createApusModel <- function(dataset, width = 12, depth = 1, device) {
 
+  self = NULL
+
   # Check arguments ---------------------------------------------------------
   # TODO
 

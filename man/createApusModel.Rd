@@ -7,7 +7,7 @@
 createApusModel(dataset, width = 12, depth = 1, device)
 }
 \arguments{
-\item{dataset}{(ApusDataset)}
+\item{dataset}{(ApusDataset) Dataset created with createApusDataset}
 
 \item{width}{(integer)}
 
