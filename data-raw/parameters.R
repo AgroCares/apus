@@ -16,6 +16,10 @@ parameters[code == 'b_area', value_max := 20000]
 parameters[code == 'd_k_req', value_max := 100]
 parameters[code == 'd_n_req', value_max := 500]
 parameters[code == 'd_p_req', value_max := 200]
+parameters[code == 'b_lu_yield', value_min := 100]
+parameters[code == 'b_lu_yield', value_max := 100000]
+parameters[code == 'b_lu_price', value_min := 0.01]
+parameters[code == 'b_lu_price', value_max := 10]
 
 # Export table ------------------------------------------------------------
 usethis::use_data(parameters, overwrite = TRUE, version = 3, compress = 'xz')

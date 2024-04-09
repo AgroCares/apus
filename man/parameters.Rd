@@ -5,7 +5,7 @@
 \alias{parameters}
 \title{Parameters table}
 \format{
-An object of class \code{data.table} (inherits from \code{data.frame}) with 9 rows and 13 columns.
+An object of class \code{data.table} (inherits from \code{data.frame}) with 11 rows and 13 columns.
 }
 \usage{
 parameters

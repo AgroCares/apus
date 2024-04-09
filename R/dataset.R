@@ -106,7 +106,9 @@ createSyntheticFields = function (fields_max, cultivations = apus::cultivations,
     d_k_req = stats::runif(n = fields_max, min = parameters[code == 'd_k_req', value_min], max = parameters[code == 'd_k_req', value_max]),
     d_n_norm = stats::runif(n = fields_max, min = parameters[code == 'd_n_norm', value_min], max = parameters[code == 'd_n_norm', value_max]),
     d_n_norm_man = stats::runif(n = fields_max, min = parameters[code == 'd_n_norm_man', value_min], max = parameters[code == 'd_n_norm_man', value_max]),
-    d_p_norm = stats::runif(n = fields_max, min = parameters[code == 'd_p_norm', value_min], max = parameters[code == 'd_p_norm', value_max])
+    d_p_norm = stats::runif(n = fields_max, min = parameters[code == 'd_p_norm', value_min], max = parameters[code == 'd_p_norm', value_max]),
+    b_lu_yield = stats::runif(n = fields_max, min = parameters[code == 'b_lu_yield', value_min], max = parameters[code == 'b_lu_yield', value_max]),
+    b_lu_price = stats::runif(n = fields_max, min = parameters[code == 'b_lu_price', value_min], max = parameters[code == 'b_lu_price', value_max])
   )
 
   return(fields)
