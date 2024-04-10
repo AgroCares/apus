@@ -1,9 +1,10 @@
 #' A torch dataset for apus
 #'
 #' @description
-#' Creates a torch dateset to be used for apus model
+#' Creates a torch dataset to be used for apus model
 #'
 #' @param fields (data.table)
+#' @param fields_max (integer)
 #' @param device (character)
 #'
 #' @import checkmate
@@ -12,18 +13,13 @@
 #' @import torch
 #'
 #'@export
-createApusDataset <- function(farms = NULL, device) {
+createApusDataset <- function(farms = NULL, fields_max, device) {
 
   transformfieldsToTensor = createSyntheticfields = code = fields_count = self = NULL
   size = value_max = value_min = P_PRICE = P_STORED = b_id_field = NULL
 
   # Check arguments ---------------------------------------------------------
   # TODO
-
-
-  # Settings ----------------------------------------------------------------
-  fields_max <- 3
-
 
   # Define torch dataset ----------------------------------------------------
   apus_dataset <- torch::dataset(
@@ -40,8 +36,8 @@ createApusDataset <- function(farms = NULL, device) {
       self$fields_max <- fields_max
       self$device <- device
       if (length(farms) > 0 ) {
-        self$farms <- transformFieldsToTensor(farms, device = device)
-        self$farms_count <- 1
+        self$farms <- farms
+        self$farms_count <- data.table::uniqueN(farms$b_id_farm)
       } else {
         self$farms <- NULL
         self$farms_count <- 100
@@ -58,12 +54,12 @@ createApusDataset <- function(farms = NULL, device) {
 
     .getitem = function(index) {
 
-      if (length(self$fields) == 0) {
+      if (length(self$farms) == 0) {
         farms <- createSyntheticFarms(1, self$fields_max, self$cultivations, apus::parameters)
-        t.fields <- transformFieldsToTensor(farms, self$device)
       } else {
-        t.fields <- self$fields[b_id_farm == index, ]
+        farms <- self$farms[b_id_farm == index, ]
       }
+      t.fields <- transformFieldsToTensor(farms, self$device)
 
       return(list(fields = t.fields, fertilizers = self$fertilizers))
     },
@@ -75,7 +71,7 @@ createApusDataset <- function(farms = NULL, device) {
 
 
   # Create torch dataset for apus -------------------------------------------
-  dataset <- apus_dataset(farms = farms, cultivations = cultivations, fertilizers = fertilizers, fields_max, device)
+  dataset <- apus_dataset(farms = farms, cultivations = cultivations, fertilizers = fertilizers, fields_max = fields_max, device = device)
 
   return(dataset)
 }

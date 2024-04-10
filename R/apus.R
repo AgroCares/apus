@@ -37,6 +37,9 @@ Apus <- R6::R6Class(
     #'@field device (character) Whether to run the model on `cpu` or `cuda`
     device = 'cpu',
 
+    #'@field fields_max (integer) Maximum number of fields for a farm
+    fields_max = 5,
+
 
     #' @description
     #' Creates a new instance of this [R6][R6::R6Class] class.
@@ -82,6 +85,7 @@ Apus <- R6::R6Class(
 
       # Create table with the data ----------------------------------------------
       field <- data.table(
+        b_id_farm = 1,
         b_id_field = b_id_field,
         b_area = b_area,
         b_lu = b_lu,
@@ -125,7 +129,7 @@ Apus <- R6::R6Class(
       # TODO
 
 
-      # Select device -----------------------------------------------------------
+            # Select device -----------------------------------------------------------
       if (device == 'cuda' & torch::cuda_is_available()){
         device <- 'cuda'
         cli::cli_alert_info('Apus model will run on  GPU')
@@ -138,11 +142,14 @@ Apus <- R6::R6Class(
       self$device <- device
 
       # Create an Apus dataset --------------------------------------------------
-      dataset <- createApusDataset(farms = NULL, device = device)
+      dataset.train <- createApusDataset(farms = NULL, fields_max = self$fields_max, device = device)
+
+      farms.valid <- createSyntheticFarms(farms_count = 1000, fields_max = self$fields_max)
+      dataset.valid <- createApusDataset(farms = farms.valid, fields_max = self$fields_max, device = device)
 
 
       # Create an Apus model ----------------------------------------------------------
-      model <- createApusModel(dataset, width = width, layers = layers, epochs = epochs, device = device)
+      model <- createApusModel(dataset.train, dataset.valid, width = width, layers = layers, epochs = epochs, device = device)
 
       self$model <- model
 
@@ -162,7 +169,17 @@ Apus <- R6::R6Class(
 
 
       # Create dataset ----------------------------------------------------------
-      dataset <- createApusDataset(farms = self$fields, device = self$device)
+      fields <- self$fields
+      if (nrow(fields) < self$fields_max) {
+        extra_fields <- self$fields_max - nrow(fields)
+        fields <- rbindlist(list(fields, data.table(
+          b_id_farm = 1,
+          b_id_field = (max(fields$b_id_field) +1): (self$fields_max)
+          )), fill = TRUE)
+        fields[is.na(fields)] <- 0
+      }
+
+      dataset <- createApusDataset(farms = fields, fields_max = self$fields_max, device = self$device)
       dl <- torch::dataloader(dataset, batch_size = 1)
 
 
@@ -176,8 +193,10 @@ Apus <- R6::R6Class(
       dt <- data.table::as.data.table(as.array(doses)[1,,])
       colnames(dt) <- self$fertilizers$P_NAME_NL
       dt <- dt[, lapply(.SD, round)]
-      dt[, b_id_field := self$fields$b_id_field]
+      dt[, b_id_field := fields$b_id_field]
+      dt <- dt[1:nrow(self$fields), ]
       data.table::setcolorder(dt, 'b_id_field')
+
 
       return(dt)
     }

@@ -1,10 +1,14 @@
 
 # Test creating model and forward pass ------------------------------------
 farms_count <- 10
+fields_max <- 5
 
-dataset <- apus::createApusDataset(farms = NULL, device = 'cpu')
-model <- createApusModel(dataset, device = 'cpu', epochs = 2)
-dl <- torch::dataloader(dataset, batch_size = farms_count)
+dataset.train <- apus::createApusDataset(farms = NULL, fields_max = fields_max, device = 'cpu')
+farms.valid <-  apus:::createSyntheticFarms(farms_count = farms_count, fields_max = fields_max)
+dataset.valid<- apus::createApusDataset(farms = farms.valid, fields_max = fields_max, device = 'cpu')
+
+model <- apus::createApusModel(dataset.train, dataset.valid, device = 'cpu', epochs = 2)
+dl <- torch::dataloader(dataset.train, batch_size = farms_count)
 
 batch <- dl$.iter()
 batch <- batch$.next()
@@ -16,7 +20,7 @@ test_that("Create model and run a forward pass", {
 
   expect_contains(class(model), 'nn_module')
   expect_contains(class(doses), 'torch_tensor')
-  expect_equal(dim(doses), c(farms_count, dataset$fields_max, nrow(dataset$fertilizers)))
+  expect_equal(dim(doses), c(farms_count, dataset.train$fields_max, nrow(dataset.train$fertilizers)))
 
   # Do not allow negative dose advice
   expect_gte(min(as.matrix(doses)), 0)

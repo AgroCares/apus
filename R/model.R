@@ -3,7 +3,8 @@
 #' @description
 #' Creates a torch model to be used for apus
 #'
-#' @param dataset (ApusDataset) Dataset created with createApusDataset
+#' @param dataset.train (ApusDataset) Dataset created with createApusDataset to train the model
+#' @param dataset.valid (ApusDataset) Dataset created with createApusDataset to validate the model
 #' @param width (integer)
 #' @param layers (integer)
 #' @param device (character)
@@ -14,7 +15,7 @@
 #' @import torch
 #'
 #'@export
-createApusModel <- function(dataset, width = 12, layers = 1, epochs = 100, device) {
+createApusModel <- function(dataset.train, dataset.valid, width = 12, layers = 1, epochs = 100, device) {
 
   self = NULL
 
@@ -87,9 +88,10 @@ createApusModel <- function(dataset, width = 12, layers = 1, epochs = 100, devic
   )
 
   # Create torch model for apus -------------------------------------------
-  model <- apus_model(dataset, width, layers, device)
+  model <- apus_model(dataset.train, width, layers, device)
   optimizer <- torch::optim_adam(model$parameters, lr = 0.001)
-  dl <- torch::dataloader(dataset, batch_size = 1)
+  dl.train <- torch::dataloader(dataset.train, batch_size = 10)
+  dl.valid <- torch::dataloader(dataset.valid, batch_size = 10)
 
 
 
@@ -98,10 +100,13 @@ createApusModel <- function(dataset, width = 12, layers = 1, epochs = 100, devic
 
     # Training loop
     losses.train <- c()
-    coro::loop(for (b in dl) {
+    model$train(TRUE)
+    coro::loop(for (b in dl.train) {
+
+      cli::cli_progress_bar(paste0('Training model [', epoch, '/', epochs, ']'), total = dl.train$.length())
 
       # For testing
-      # b <- dl$.iter()
+      # b <- dl.train$.iter()
       # b <- b$.next()
 
       # Forward pass
@@ -115,13 +120,38 @@ createApusModel <- function(dataset, width = 12, layers = 1, epochs = 100, devic
 
       losses.train <- c(losses.train, cost$item())
 
-    })
+      cli::cli_progress_update(status = paste0('Loss: ', signif(mean(losses.train, 4))))
 
-    cat(sprintf("Loss at epoch %d: %3f\n", epoch, mean(losses.train)))
+    })
+    cli::cli_progress_done()
 
     # Validation loop
+    model$eval()
+    losses.validation <- c()
+    coro::loop(for (b in dl.valid) {
+
+      cli::cli_progress_bar(paste0('Validating model [', epoch, '/', epochs, ']'), total = dl.valid$.length())
+
+      # For testing
+      # b <- dl.valid$.iter()
+      # b <- b$.next()
+
+      # Forward pass
+      doses <- model(b$fields, b$fertilizers)
+      cost <- calculateCost(doses, b$fields, b$fertilizers)
+
+      losses.validation <- c(losses.validation, cost$item())
+
+      cli::cli_progress_update(status = paste0('Loss: ', signif(mean(losses.validation, 4))))
+
+    })
+
+    loss.train <- signif(mean(losses.train), 4)
+    loss.validation <- signif(mean(losses.validation), 4)
+    cli::cli_alert_info('Epoch [{epoch}/{epochs}] Training loss: {loss.train}; Validation loss: {loss.validation}')
 
   }
+  cli::cli_alert_success('Finished model training')
 
   return(model)
 }
