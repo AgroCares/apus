@@ -12,7 +12,7 @@
 #' @import torch
 #'
 #'@export
-createApusDataset <- function(fields = NULL, device) {
+createApusDataset <- function(farms = NULL, device) {
 
   transformfieldsToTensor = createSyntheticfields = code = fields_count = self = NULL
   size = value_max = value_min = P_PRICE = P_STORED = b_id_field = NULL
@@ -29,7 +29,7 @@ createApusDataset <- function(fields = NULL, device) {
   apus_dataset <- torch::dataset(
     name = "apus_dataset",
 
-    initialize = function(fields = NULL, cultivations = apus::cultivations, fertilizers = apus::fertilizers, fields_max, device) {
+    initialize = function(farms = NULL, cultivations = apus::cultivations, fertilizers = apus::fertilizers, fields_max, device) {
 
       # Check arguments -----------------------------------------------------
       # TODO
@@ -39,11 +39,11 @@ createApusDataset <- function(fields = NULL, device) {
 
       self$fields_max <- fields_max
       self$device <- device
-      if (length(fields) > 0 ) {
-        self$fields <- transformFieldsToTensor(fields, device = device)
+      if (length(farms) > 0 ) {
+        self$farms <- transformFieldsToTensor(farms, device = device)
         self$farms_count <- 1
       } else {
-        self$fields <- NULL
+        self$farms <- NULL
         self$farms_count <- 100
       }
 
@@ -59,10 +59,10 @@ createApusDataset <- function(fields = NULL, device) {
     .getitem = function(index) {
 
       if (length(self$fields) == 0) {
-        fields <- createSyntheticFields(self$fields_max, self$cultivations, apus::parameters)
-        t.fields <- transformFieldsToTensor(fields, self$device)
+        farms <- createSyntheticFarms(1, self$fields_max, self$cultivations, apus::parameters)
+        t.fields <- transformFieldsToTensor(farms, self$device)
       } else {
-        t.fields <- self$fields #[b_id_field == index, ]
+        t.fields <- self$fields[b_id_farm == index, ]
       }
 
       return(list(fields = t.fields, fertilizers = self$fertilizers))
@@ -75,7 +75,7 @@ createApusDataset <- function(fields = NULL, device) {
 
 
   # Create torch dataset for apus -------------------------------------------
-  dataset <- apus_dataset(fields = fields, cultivations = apus::cultivations, fertilizers = apus::fertilizers, fields_max, device)
+  dataset <- apus_dataset(farms = farms, cultivations = cultivations, fertilizers = fertilizers, fields_max, device)
 
   return(dataset)
 }
@@ -95,22 +95,24 @@ transformFieldsToTensor = function(fields, device) {
   return(t.tensor)
 }
 
-createSyntheticFields = function (fields_max, cultivations = apus::cultivations, parameters = apus::parameters) {
+createSyntheticFarms = function (farms_count, fields_max, cultivations = apus::cultivations, parameters = apus::parameters) {
 
   code = value_min = value_max = NULL
 
+  size <- farms_count * fields_max
   fields <- data.table(
-    b_id_field = 1:fields_max,
+    b_id_farm = rep(1:farms_count, each = fields_max),
+    b_id_field = rep(1:fields_max, times = farms_count),
     # b_lu = sample(x = cultivations$b_lu, fields_max = fields_max, replace = TRUE),
-    b_area = stats::runif(n = fields_max, min = parameters[code == 'b_area', value_min], max = parameters[code == 'b_area', value_max]),
-    d_n_req =  stats::runif(n = fields_max, min = parameters[code == 'd_n_req', value_min], max = parameters[code == 'd_n_req', value_max]),
-    d_p_req = stats::runif(n = fields_max, min = parameters[code == 'd_p_req', value_min], max = parameters[code == 'd_p_req', value_max]),
-    d_k_req = stats::runif(n = fields_max, min = parameters[code == 'd_k_req', value_min], max = parameters[code == 'd_k_req', value_max]),
-    d_n_norm = stats::runif(n = fields_max, min = parameters[code == 'd_n_norm', value_min], max = parameters[code == 'd_n_norm', value_max]),
-    d_n_norm_man = stats::runif(n = fields_max, min = parameters[code == 'd_n_norm_man', value_min], max = parameters[code == 'd_n_norm_man', value_max]),
-    d_p_norm = stats::runif(n = fields_max, min = parameters[code == 'd_p_norm', value_min], max = parameters[code == 'd_p_norm', value_max]),
-    b_lu_yield = stats::runif(n = fields_max, min = parameters[code == 'b_lu_yield', value_min], max = parameters[code == 'b_lu_yield', value_max]),
-    b_lu_price = stats::runif(n = fields_max, min = parameters[code == 'b_lu_price', value_min], max = parameters[code == 'b_lu_price', value_max])
+    b_area = stats::runif(n = size, min = parameters[code == 'b_area', value_min], max = parameters[code == 'b_area', value_max]),
+    d_n_req =  stats::runif(n = size, min = parameters[code == 'd_n_req', value_min], max = parameters[code == 'd_n_req', value_max]),
+    d_p_req = stats::runif(n = size, min = parameters[code == 'd_p_req', value_min], max = parameters[code == 'd_p_req', value_max]),
+    d_k_req = stats::runif(n = size, min = parameters[code == 'd_k_req', value_min], max = parameters[code == 'd_k_req', value_max]),
+    d_n_norm = stats::runif(n = size, min = parameters[code == 'd_n_norm', value_min], max = parameters[code == 'd_n_norm', value_max]),
+    d_n_norm_man = stats::runif(n = size, min = parameters[code == 'd_n_norm_man', value_min], max = parameters[code == 'd_n_norm_man', value_max]),
+    d_p_norm = stats::runif(n = size, min = parameters[code == 'd_p_norm', value_min], max = parameters[code == 'd_p_norm', value_max]),
+    b_lu_yield = stats::runif(n = size, min = parameters[code == 'b_lu_yield', value_min], max = parameters[code == 'b_lu_yield', value_max]),
+    b_lu_price = stats::runif(n = size, min = parameters[code == 'b_lu_price', value_min], max = parameters[code == 'b_lu_price', value_max])
   )
 
   return(fields)

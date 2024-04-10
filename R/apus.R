@@ -138,7 +138,7 @@ Apus <- R6::R6Class(
       self$device <- device
 
       # Create an Apus dataset --------------------------------------------------
-      dataset <- createApusDataset(fields = NULL, device = device)
+      dataset <- createApusDataset(farms = NULL, device = device)
 
 
       # Create an Apus model ----------------------------------------------------------
@@ -162,14 +162,14 @@ Apus <- R6::R6Class(
 
 
       # Create dataset ----------------------------------------------------------
-      dataset <- createApusDataset(fields = self$fields, device = self$device)
+      dataset <- createApusDataset(farms = self$fields, device = self$device)
       dl <- torch::dataloader(dataset, batch_size = 1)
 
 
       # Predict optimal fertilizer choice ---------------------------------------
       batch <- dl$.iter()
       batch <- batch$.next()
-      doses <- apus$model(batch$fields, batch$fertilizers)
+      doses <- self$model(batch$fields, batch$fertilizers)
 
 
       # Format to output --------------------------------------------------------
