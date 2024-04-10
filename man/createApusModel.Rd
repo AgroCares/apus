@@ -4,14 +4,23 @@
 \alias{createApusModel}
 \title{A torch model for apus}
 \usage{
-createApusModel(dataset, width = 12, depth = 1, device)
+createApusModel(
+  dataset.train,
+  dataset.valid,
+  width = 12,
+  layers = 1,
+  epochs = 100,
+  device
+)
 }
 \arguments{
-\item{dataset}{(ApusDataset) Dataset created with createApusDataset}
+\item{dataset.train}{(ApusDataset) Dataset created with createApusDataset to train the model}
+
+\item{dataset.valid}{(ApusDataset) Dataset created with createApusDataset to validate the model}
 
 \item{width}{(integer)}
 
-\item{depth}{(integer)}
+\item{layers}{(integer)}
 
 \item{device}{(character)}
 }

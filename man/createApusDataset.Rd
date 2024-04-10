@@ -4,13 +4,15 @@
 \alias{createApusDataset}
 \title{A torch dataset for apus}
 \usage{
-createApusDataset(fields = NULL, device)
+createApusDataset(farms = NULL, fields_max, device)
 }
 \arguments{
-\item{fields}{(data.table)}
+\item{fields_max}{(integer)}
 
 \item{device}{(character)}
+
+\item{fields}{(data.table)}
 }
 \description{
-Creates a torch dateset to be used for apus model
+Creates a torch dataset to be used for apus model
 }

@@ -21,6 +21,12 @@ A farm needs to have fields, fertilizer etc
 \item{\code{fertilizers}}{(data.table) A table with the properties of the fertilizers}
 
 \item{\code{fines}}{(data.table) A table with the properties of the fines}
+
+\item{\code{model}}{(nn_module) The model to use for optimization of fertilizer choice}
+
+\item{\code{device}}{(character) Whether to run the model on \code{cpu} or \code{cuda}}
+
+\item{\code{fields_max}}{(integer) Maximum number of fields for a farm}
 }
 \if{html}{\out{</div>}}
 }
@@ -29,6 +35,8 @@ A farm needs to have fields, fertilizer etc
 \itemize{
 \item \href{#method-Apus-new}{\code{Apus$new()}}
 \item \href{#method-Apus-addField}{\code{Apus$addField()}}
+\item \href{#method-Apus-trainModel}{\code{Apus$trainModel()}}
+\item \href{#method-Apus-optimizeFertilizerChoice}{\code{Apus$optimizeFertilizerChoice()}}
 \item \href{#method-Apus-clone}{\code{Apus$clone()}}
 }
 }
@@ -56,7 +64,7 @@ Creates a new instance of this \link[R6:R6Class]{R6} class.
 Add a field to the apus object
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Apus$addField(
-  b_id,
+  b_id_field,
   b_area,
   b_lu,
   d_n_req = NA,
@@ -71,7 +79,7 @@ Add a field to the apus object
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{b_id}}{(character) ID or (unique) name of the field}
+\item{\code{b_id_field}}{(character) ID or (unique) name of the field}
 
 \item{\code{b_area}}{(number) The area of the field (m^2)}
 
@@ -91,6 +99,39 @@ Add a field to the apus object
 }
 \if{html}{\out{</div>}}
 }
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Apus-trainModel"></a>}}
+\if{latex}{\out{\hypertarget{method-Apus-trainModel}{}}}
+\subsection{Method \code{trainModel()}}{
+Train a model
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Apus$trainModel(width = 12, layers = 1, epochs = 3, device = "cpu")}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{width}}{(integer)}
+
+\item{\code{layers}}{(integer)}
+
+\item{\code{epochs}}{(integer)}
+
+\item{\code{device}}{(character)}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Apus-optimizeFertilizerChoice"></a>}}
+\if{latex}{\out{\hypertarget{method-Apus-optimizeFertilizerChoice}{}}}
+\subsection{Method \code{optimizeFertilizerChoice()}}{
+Optimize fertilizer choice
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Apus$optimizeFertilizerChoice()}\if{html}{\out{</div>}}
+}
+
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Apus-clone"></a>}}
