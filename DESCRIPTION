@@ -7,7 +7,10 @@ Authors@R: c(
            family = "Verweij",
            email = "sven.verweij@nmi-agro.nl",
            role = c("aut","cre"),
-           comment = c(ORCID = '0000-0002-5573-3952')))
+           comment = c(ORCID = '0000-0002-5573-3952'))
+     person(given = "Nutriënten Managment Instituut",
+           email = "nmi@nmi-agro.nl",
+           role = "cph"))
 Description: apus optimizes the fertilizer mix for a farm based on the nutrient 
     requirements, legal norms, cultivation response curves, available fertilizers 
     and tries to archieve the best economic result within the provided boundaries.
