@@ -4,10 +4,14 @@
 \alias{createApusDataset}
 \title{A torch dataset for apus}
 \usage{
-createApusDataset(farms = NULL, fields_max, device)
+createApusDataset(farms = NULL, cultivations, fertilizers, fields_max, device)
 }
 \arguments{
 \item{farms}{(data.table)}
+
+\item{cultivations}{(data.table)}
+
+\item{fertilizers}{(data.table)}
 
 \item{fields_max}{(integer)}
 
