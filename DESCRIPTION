@@ -7,7 +7,7 @@ Authors@R: c(
            family = "Verweij",
            email = "sven.verweij@nmi-agro.nl",
            role = c("aut","cre"),
-           comment = c(ORCID = '0000-0002-5573-3952'))
+           comment = c(ORCID = '0000-0002-5573-3952')),
      person(given = "Nutriënten Managment Instituut",
            email = "nmi@nmi-agro.nl",
            role = "cph"))
