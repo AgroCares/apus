@@ -7,6 +7,7 @@
 #' @param dataset.valid (ApusDataset) Dataset created with createApusDataset to validate the model
 #' @param width (integer)
 #' @param layers (integer)
+#' @param epochs (integer)
 #' @param device (character)
 #'
 #' @import checkmate

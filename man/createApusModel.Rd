@@ -22,6 +22,8 @@ createApusModel(
 
 \item{layers}{(integer)}
 
+\item{epochs}{(integer)}
+
 \item{device}{(character)}
 }
 \description{
