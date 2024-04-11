@@ -19,5 +19,10 @@ Useful links:
 \author{
 \strong{Maintainer}: Sven Verweij \email{sven.verweij@nmi-agro.nl} (\href{https://orcid.org/0000-0002-5573-3952}{ORCID})
 
+Other contributors:
+\itemize{
+  \item Nutriënten Managment Instituut \email{nmi@nmi-agro.nl} [copyright holder]
+}
+
 }
 \keyword{internal}
