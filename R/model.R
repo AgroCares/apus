@@ -168,12 +168,12 @@ calculateCost <- function(doses, fields, fertilizers, sum_batches = TRUE) {
   module1 <- calculateCostModule1(doses, fertilizers)
 
 
-  # Module 4: Yield of cultivations -----------------------------------------
-
+  # Module 4: Revenue from harvested crops -----------------------------------
+  module4 <- calculateRevenueModule4(doses, fields, fertilizers)
 
 
   # Combine the modules -----------------------------------------------------
-  cost <- torch::torch_zeros(dim(doses)[1]) + module1
+  cost <- torch::torch_zeros(dim(module1)) + module1 - module4
 
 
   # Reduce batches to single value ------------------------------------------
@@ -203,8 +203,8 @@ calculateCostModule1 <- function(doses, fertilizers) {
   return(module1)
 }
 
-# Module 4: Yield of cultivations -------------------------------------------
-calculateCostModule4 <- function(doses, fields, fertilizers) {
+# Module 4: Revenue from harvested crops  ------------------------------------
+calculateRevenueModule4 <- function(doses, fields, fertilizers) {
 
   # Calculate N dose per fields
   fertilizers.p_n_rt <- fertilizers[,,3]
@@ -218,8 +218,10 @@ calculateCostModule4 <- function(doses, fields, fertilizers) {
   # Calculate N requirement realization
   fields.d_n_req <- fields[,,2]
   fields.d_n_gap <- fields.d_n_req - fields.dose.n_workable
-  fields.d_n_gap <- torch::torch_where(fields.d_n_gap < 0, torch::torch_zeros(dim(fields.d_n_gap)), fields.d_n_gap)
+  fields.d_n_gap <- torch::torch_relu(fields.d_n_gap)
   fields.d_n_realized <- torch::torch_ones(dim(fields.d_n_gap)) - (fields.d_n_gap / fields.d_n_req)
+  fields.d_n_realized <- torch::torch_unsqueeze(fields.d_n_realized, -1)
+
 
   # Calculate P dose per fields
   fertilizers.p_p_rt <- fertilizers[,,5]
@@ -231,8 +233,9 @@ calculateCostModule4 <- function(doses, fields, fertilizers) {
   # Calculate P requirement realization
   fields.d_p_req <- fields[,,3]
   fields.d_p_gap <- fields.d_p_req - fields.dose.p
-  fields.d_p_gap <- torch::torch_where(fields.d_p_gap < 0, torch::torch_zeros(dim(fields.d_p_gap)), fields.d_p_gap)
+  fields.d_p_gap <- torch::torch_relu(fields.d_p_gap)
   fields.d_p_realized <- torch::torch_ones(dim(fields.d_p_gap)) - (fields.d_p_gap / fields.d_p_req)
+  fields.d_p_realized <- torch::torch_unsqueeze(fields.d_p_realized, -1)
 
 
   # Calculate K dose per fields
@@ -245,17 +248,20 @@ calculateCostModule4 <- function(doses, fields, fertilizers) {
   # Calculate K requirement realization
   fields.d_k_req <- fields[,,4]
   fields.d_k_gap <- fields.d_k_req - fields.dose.k
-  fields.d_k_gap <- torch::torch_where(fields.d_k_gap < 0, torch::torch_zeros(dim(fields.d_k_gap)), fields.d_k_gap)
+  fields.d_k_gap <- torch::torch_relu(fields.d_k_gap)
   fields.d_k_realized <- torch::torch_ones(dim(fields.d_k_gap)) - (fields.d_k_gap / fields.d_k_req)
+  fields.d_k_realized <- torch::torch_unsqueeze(fields.d_k_realized, -1)
+
 
   # Calculate the forecasted yield
-  fields.d_realized <- torch::torch_cat(list(fields.d_n_realized, fields.d_p_realized, fields.d_k_realized), dim=3)
-  fields.d_realized <- torch_minimum(fields.d_realized, dim = 3)
+  fields.d_realized <- torch::torch_cat(list(fields.d_n_realized, fields.d_p_realized, fields.d_k_realized), dim=3L)
+  fields.d_realized <- torch::torch_mean(fields.d_realized, dim = 3, keepdim = TRUE) # TODO This should be converted to minimum
+  fields.d_realized <- torch::torch_squeeze(fields.d_realized, dim = -1)
   fields.b_area <- fields[,,1]
-  fields.b_lu_yield <- fields[,,7]
-  fields.b_lu_price <- fields[,,8]
-  module4 <- fields.b_area *  fields.b_lu_yield * fields.b_lu_price * fields.d_n_realized
-  module4 <- torch::torch_sum(module4, dim  = 2)
+  fields.b_lu_yield <- fields[,,8]
+  fields.b_lu_price <- fields[,,9]
+  module4 <- fields.b_area *  fields.b_lu_yield * fields.b_lu_price * fields.d_realized
+  module4 <- torch::torch_sum(module4, dim = 2L)
 
   return(module4)
 }
