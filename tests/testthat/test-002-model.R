@@ -3,9 +3,9 @@
 farms_count <- 10
 fields_max <- 5
 
-dataset.train <- apus::createApusDataset(farms = NULL, fields_max = fields_max, device = 'cpu')
+dataset.train <- apus::createApusDataset(farms = NULL, cultivations = apus::cultivations, fertilizers = apus::fertilizers, fields_max = fields_max, device = 'cpu')
 farms.valid <-  apus:::createSyntheticFarms(farms_count = farms_count, fields_max = fields_max)
-dataset.valid<- apus::createApusDataset(farms = farms.valid, fields_max = fields_max, device = 'cpu')
+dataset.valid<- apus::createApusDataset(farms = farms.valid, cultivations = apus::cultivations, fertilizers = apus::fertilizers, fields_max = fields_max, device = 'cpu')
 
 model <- apus::createApusModel(dataset.train, dataset.valid, device = 'cpu', epochs = 2)
 dl <- torch::dataloader(dataset.train, batch_size = farms_count)

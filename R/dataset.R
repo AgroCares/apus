@@ -3,7 +3,9 @@
 #' @description
 #' Creates a torch dataset to be used for apus model
 #'
-#' @param fields (data.table)
+#' @param farms (data.table)
+#' @param cultivations (data.table)
+#' @param fertilizers (data.table)
 #' @param fields_max (integer)
 #' @param device (character)
 #'
@@ -13,10 +15,10 @@
 #' @import torch
 #'
 #'@export
-createApusDataset <- function(farms = NULL, fields_max, device) {
+createApusDataset <- function(farms = NULL, cultivations, fertilizers, fields_max, device) {
 
   transformfieldsToTensor = createSyntheticfields = code = fields_count = self = NULL
-  size = value_max = value_min = P_PRICE = P_STORED = b_id_field = NULL
+  size = value_max = value_min = p_price = p_stored = b_id_farm = b_id_field = NULL
 
   # Check arguments ---------------------------------------------------------
   # TODO
@@ -25,7 +27,7 @@ createApusDataset <- function(farms = NULL, fields_max, device) {
   apus_dataset <- torch::dataset(
     name = "apus_dataset",
 
-    initialize = function(farms = NULL, cultivations = apus::cultivations, fertilizers = apus::fertilizers, fields_max, device) {
+    initialize = function(farms = NULL, cultivations, fertilizers, fields_max, device) {
 
       # Check arguments -----------------------------------------------------
       # TODO

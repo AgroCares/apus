@@ -142,10 +142,10 @@ Apus <- R6::R6Class(
       self$device <- device
 
       # Create an Apus dataset --------------------------------------------------
-      dataset.train <- createApusDataset(farms = NULL, fields_max = self$fields_max, device = device)
+      dataset.train <- createApusDataset(farms = NULL, cultivation = self$cultivation, fertilizers = self$fertilizers, fields_max = self$fields_max, device = device)
 
       farms.valid <- createSyntheticFarms(farms_count = 1000, fields_max = self$fields_max)
-      dataset.valid <- createApusDataset(farms = farms.valid, fields_max = self$fields_max, device = device)
+      dataset.valid <- createApusDataset(farms = farms.valid, cultivation = self$cultivation, fertilizers = self$fertilizers, fields_max = self$fields_max, device = device)
 
 
       # Create an Apus model ----------------------------------------------------------
@@ -179,7 +179,7 @@ Apus <- R6::R6Class(
         fields[is.na(fields)] <- 0
       }
 
-      dataset <- createApusDataset(farms = fields, fields_max = self$fields_max, device = self$device)
+      dataset <- createApusDataset(farms = fields, cultivations = self$cultivations, fertilizers = self$fertilizers, fields_max = self$fields_max, device = self$device)
       dl <- torch::dataloader(dataset, batch_size = 1)
 
 

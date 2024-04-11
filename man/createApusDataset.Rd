@@ -7,11 +7,11 @@
 createApusDataset(farms = NULL, fields_max, device)
 }
 \arguments{
+\item{farms}{(data.table)}
+
 \item{fields_max}{(integer)}
 
 \item{device}{(character)}
-
-\item{fields}{(data.table)}
 }
 \description{
 Creates a torch dataset to be used for apus model

@@ -1,6 +1,6 @@
 test_that("Create training dataset", {
   fields_max <- 5
-  dataset <- apus::createApusDataset(farms = NULL, fields_max = fields_max, device = 'cpu')
+  dataset <- apus::createApusDataset(farms = NULL, cultivations = apus::cultivations, fertilizers = apus::fertilizers, fields_max = fields_max, device = 'cpu')
   expect_contains(class(dataset), 'apus_dataset')
   expect_equal(dataset$.length(), dataset$farms_count)
   expect_contains(class(dataset$.getitem(1)$fields), 'torch_tensor')
@@ -17,7 +17,7 @@ test_that("Create validation/test dataset", {
   expect_contains(class(farms), 'data.table')
   expect_equal(nrow(farms), farms_count * fields_max)
 
-  dataset.valid <- apus::createApusDataset(farms = farms, fields_max = fields_max, device = 'cpu')
+  dataset.valid <- apus::createApusDataset(farms = farms, cultivations = apus::cultivations, fertilizers = apus::fertilizers, fields_max = fields_max, device = 'cpu')
   expect_contains(class(dataset.valid), 'apus_dataset')
   expect_equal(dataset.valid$.length(), dataset.valid$farms_count)
   expect_contains(class(dataset.valid$.getitem(1)$fields), 'torch_tensor')
