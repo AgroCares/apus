@@ -76,9 +76,11 @@ Apus <- R6::R6Class(
     #' @param d_n_norm (number) The legal limit for workable Nitrogen (kg N / ha)
     #' @param d_n_norm_man (number) The legal limit for total Nitrogen from manure (kg N / ha
     #' @param d_p_norm (number) The legal limit for Phosphate (kg P2O5 / ha)
+    #' @param b_lu_yield (number) Expected harvest (kg  / ha)
+    #' @param b_lu_price (number) Expected price for harvest (€/ kg)
     #'
     #' @export
-    addField = function(b_id_field, b_area, b_lu, d_n_req = NA, d_p_req = NA, d_k_req = NA, d_n_norm = NA, d_n_norm_man = NA, d_p_norm = NA) {
+    addField = function(b_id_field, b_area, b_lu, d_n_req = NA, d_p_req = NA, d_k_req = NA, d_n_norm = NA, d_n_norm_man = NA, d_p_norm = NA, b_lu_yield = NA, b_lu_price = NA) {
 
       # Check arguments ---------------------------------------------------------
       # TODO
@@ -94,7 +96,9 @@ Apus <- R6::R6Class(
         d_k_req = d_k_req,
         d_n_norm = d_n_norm,
         d_n_norm_man = d_n_norm_man,
-        d_p_norm = d_p_norm
+        d_p_norm = d_p_norm,
+        b_lu_yield = b_lu_yield,
+        b_lu_price = b_lu_price
       )
 
       # Append field to fields --------------------------------------------------
@@ -191,7 +195,7 @@ Apus <- R6::R6Class(
 
       # Format to output --------------------------------------------------------
       dt <- data.table::as.data.table(as.array(doses)[1,,])
-      colnames(dt) <- self$fertilizers$P_NAME_NL
+      colnames(dt) <- self$fertilizers$p_name_nl
       dt <- dt[, lapply(.SD, round)]
       dt[, b_id_field := fields$b_id_field]
       dt <- dt[1:nrow(self$fields), ]
