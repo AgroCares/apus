@@ -28,7 +28,7 @@ test_that("Create model and run a forward pass", {
 
 # Test cost functions of modules ------------------------------------------
 
-module1 <- calculateCostModule1(doses, fertilizers)
+module1 <- calculateCostModule1(doses, fields, fertilizers)
 
 test_that("Calculate cost for module 1: Purchase of fertilizers", {
   expect_contains(class(module1), 'torch_tensor')

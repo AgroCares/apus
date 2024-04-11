@@ -165,7 +165,7 @@ calculateCost <- function(doses, fields, fertilizers, sum_batches = TRUE) {
 
 
   # Module 1: Purchase of fertilizers ---------------------------------------
-  module1 <- calculateCostModule1(doses, fertilizers)
+  module1 <- calculateCostModule1(doses, fields, fertilizers)
 
 
   # Module 4: Revenue from harvested crops -----------------------------------
@@ -185,19 +185,21 @@ calculateCost <- function(doses, fields, fertilizers, sum_batches = TRUE) {
 }
 
 # Module 1: Purchase of fertilizers ---------------------------------------
-calculateCostModule1 <- function(doses, fertilizers) {
+calculateCostModule1 <- function(doses, fields, fertilizers) {
 
   # Sum dose per fertilizer -------------------------------------------------
+  fields.b_area <- torch::torch_unsqueeze(fields[,,1], -1)
+  fields.dose <- fields.b_area * doses
   fertilizers.dose <- torch::torch_sum(doses, dim = 2L)
 
 
   # Calculate cost per fertilizer -------------------------------------------
   fertilizers.price <- fertilizers[,,2]
-  fertilzers.cost <- fertilizers.dose * fertilizers.price
+  fertilizers.cost <- fertilizers.dose * fertilizers.price
 
 
   # Sum cost for farm -------------------------------------------------------
-  module1 <- torch::torch_sum(fertilzers.cost, dim = 2L)
+  module1 <- torch::torch_sum(fertilizers.cost, dim = 2L)
 
 
   return(module1)
