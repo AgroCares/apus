@@ -8,5 +8,7 @@
 
 library(testthat)
 library(apus)
+library(torch)
 
+torch::install_torch()
 test_check("apus")
