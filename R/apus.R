@@ -68,7 +68,7 @@ Apus <- R6::R6Class(
     #' Add a field to the apus object
     #'
     #' @param b_id_field (character) ID or (unique) name of the field
-    #' @param b_area (number) The area of the field (m^2)
+    #' @param b_area (number) The area of the field (ha)
     #' @param b_lu (character) The cultivation code for this field
     #' @param d_n_req (number) The required amount of Nitrogen for this field (kg N / ha)
     #' @param d_p_req (number) The required amount of Phosphate for this field (kg P2O5 / ha)

@@ -157,7 +157,7 @@ createApusModel <- function(dataset.train, dataset.valid, width = 12, layers = 1
   return(model)
 }
 
-calculateCost <- function(doses, fields, fertilizers, sum_batches = TRUE) {
+calculateCost <- function(doses, fields, fertilizers, reduce_batches = TRUE) {
 
 
   # Check arguments ---------------------------------------------------------
@@ -168,7 +168,7 @@ calculateCost <- function(doses, fields, fertilizers, sum_batches = TRUE) {
   module1 <- calculateCostModule1(doses, fields, fertilizers)
 
 
-  # Module 4: Revenue from harvested crops -----------------------------------
+  # Module 4: Revenue from harvested crops ----------------------------------
   module4 <- calculateRevenueModule4(doses, fields, fertilizers)
 
 
@@ -176,12 +176,18 @@ calculateCost <- function(doses, fields, fertilizers, sum_batches = TRUE) {
   cost <- torch::torch_zeros(dim(module1)) + module1 - module4
 
 
+  # Convert to € / ha -------------------------------------------------------
+  fields.b_area <- fields[,,1]
+  farms.b_area <- torch::torch_sum(fields.b_area, dim = 2L)
+  cost.area <- cost  / farms.b_area
+
+
   # Reduce batches to single value ------------------------------------------
-  if (sum_batches) {
-    cost <- torch::torch_sum(cost)
+  if (reduce_batches) {
+    cost.area <- torch::torch_mean(cost.area)
   }
 
-  return(cost)
+  return(cost.area)
 }
 
 # Module 1: Purchase of fertilizers ---------------------------------------

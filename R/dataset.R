@@ -102,7 +102,7 @@ createSyntheticFarms = function (farms_count, fields_max, cultivations = apus::c
     b_id_farm = rep(1:farms_count, each = fields_max),
     b_id_field = rep(1:fields_max, times = farms_count),
     # b_lu = sample(x = cultivations$b_lu, fields_max = fields_max, replace = TRUE),
-    b_area = stats::runif(n = size, min = parameters[code == 'b_area', value_min], max = parameters[code == 'b_area', value_max]),
+    b_area = stats::runif(n = size, min = parameters[code == 'b_area', value_min], max = parameters[code == 'b_area', value_max]) / 10000,
     d_n_req =  stats::runif(n = size, min = parameters[code == 'd_n_req', value_min], max = parameters[code == 'd_n_req', value_max]),
     d_p_req = stats::runif(n = size, min = parameters[code == 'd_p_req', value_min], max = parameters[code == 'd_p_req', value_max]),
     d_k_req = stats::runif(n = size, min = parameters[code == 'd_k_req', value_min], max = parameters[code == 'd_k_req', value_max]),
