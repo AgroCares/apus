@@ -133,13 +133,17 @@ Apus <- R6::R6Class(
       # TODO
 
 
-            # Select device -----------------------------------------------------------
-      if (device == 'cuda' & torch::cuda_is_available()){
-        device <- 'cuda'
-        cli::cli_alert_info('Apus model will run on  GPU')
-      } else if  (device == 'cuda' & ! torch::cuda_is_available()) {
-        device <- 'cpu'
-        cli::cli_alert_warning('cuda is not available. Apus model will therefore run on CPU instead of GPU')
+      # Select device -----------------------------------------------------------
+      if (device == 'cuda') {
+        if (torch::cuda_is_available()){
+          device <- 'cuda'
+          cli::cli_alert_info('Apus model will run on  GPU')
+        } else if  (! torch::cuda_is_available()) {
+          device <- 'cpu'
+          cli::cli_alert_warning('cuda is not available. Apus model will therefore run on CPU instead of GPU')
+        } else {
+          device <- 'cpu'
+        }
       } else {
         device <- 'cpu'
       }
