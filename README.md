@@ -15,7 +15,7 @@ The R package `apus` optimizes the fertilizer mix for a farm based on the nutrie
 ## Installation
 Currently the `apus` package is in development and only available to install via GitHub. Use the following command to install the latest development version:
 
-`remotes::install_github('AgroCares/pandex')`
+`remotes::install_github('AgroCares/apus')`
 
 ## Getting started
 `apus` makes use of [R6](https://cran.r-project.org/web/packages/R6/index.html) to keep track of data of a farm.
@@ -27,7 +27,7 @@ apus <- apus::Apus$new(farm_name = 'my farm')
 Then you can add fields to your farm with the `addField()` function. Multiple fields can be added by using again the `addField()` function
 
 ```
-apus$addFields(
+apus$addField(
   b_id_field = 1L,
   b_area = 10000,
   b_lu = 'nl_2014',
@@ -42,7 +42,7 @@ apus$addFields(
 )
 
 # Add a second field
-apus$addFields(
+apus$addField(
   b_id_field = 1L,
   b_area = 5000,
   b_lu = 'nl_262',
