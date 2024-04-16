@@ -70,20 +70,30 @@ Apus <- R6::R6Class(
     #' @param b_id_field (character) ID or (unique) name of the field
     #' @param b_area (number) The area of the field (ha)
     #' @param b_lu (character) The cultivation code for this field
-    #' @param d_n_req (number) The required amount of Nitrogen for this field (kg N / ha)
-    #' @param d_p_req (number) The required amount of Phosphate for this field (kg P2O5 / ha)
-    #' @param d_k_req (number) The required amount of Potassium for this field (kg K2O / ha)
-    #' @param d_n_norm (number) The legal limit for workable Nitrogen (kg N / ha)
-    #' @param d_n_norm_man (number) The legal limit for total Nitrogen from manure (kg N / ha
-    #' @param d_p_norm (number) The legal limit for Phosphate (kg P2O5 / ha)
-    #' @param b_lu_yield (number) Expected harvest (kg  / ha)
+    #' @param d_n_req (number) The required amount of Nitrogen for this field (kg N / ha / year)
+    #' @param d_p_req (number) The required amount of Phosphate for this field (kg P2O5 / ha / year)
+    #' @param d_k_req (number) The required amount of Potassium for this field (kg K2O / ha / year)
+    #' @param d_n_norm (number) The legal limit for workable Nitrogen (kg N / ha / year)
+    #' @param d_n_norm_man (number) The legal limit for total Nitrogen from manure (kg N / ha / year)
+    #' @param d_p_norm (number) The legal limit for Phosphate (kg P2O5 / ha / year)
+    #' @param b_lu_yield (number) Expected harvest (kg  dry matter/ ha)
     #' @param b_lu_price (number) Expected price for harvest (€/ kg)
     #'
     #' @export
     addField = function(b_id_field, b_area, b_lu, d_n_req = NA, d_p_req = NA, d_k_req = NA, d_n_norm = NA, d_n_norm_man = NA, d_p_norm = NA, b_lu_yield = NA, b_lu_price = NA) {
 
       # Check arguments ---------------------------------------------------------
-      # TODO
+      checkmate::assert_character(b_id_field,len = 1)
+      checkmate::assert_numeric(b_area,lower = 0, upper = 100)
+      checkmate::assert_subset(b_lu,choices = apus::cultivations$b_lu)
+      checkmate::assert_numeric(d_n_req,lower = 0, upper = 400)
+      checkmate::assert_numeric(d_p_req,lower = 0, upper = 150)
+      checkmate::assert_numeric(d_k_req,lower = 0, upper = 800)
+      checkmate::assert_numeric(d_n_norm,lower = 0, upper = 400)
+      checkmate::assert_numeric(d_n_norm_man,lower = 0, upper = 250)
+      checkmate::assert_numeric(d_p_norm,lower = 0, upper = 100)
+      checkmate::assert_numeric(b_lu_yield,lower = 0, upper = 100000)
+      checkmate::assert_numeric(b_lu_price,lower = 0, upper = 100)
 
       # Create table with the data ----------------------------------------------
       field <- data.table(
@@ -101,10 +111,14 @@ Apus <- R6::R6Class(
         b_lu_price = b_lu_price
       )
 
+      setkey(field, b_id_field)
+
       # Append field to fields --------------------------------------------------
       if (length(self$fields) == 0) {
-        setkey(field, b_id_field)
+
+        # add field to self
         self$fields <- field
+
       } else {
 
         # Check if b_id_field is not already used ----------------------------------------
@@ -112,6 +126,7 @@ Apus <- R6::R6Class(
           cli_abort('The field {b_id_field} is already present and duplicate fields are not allowed.')
         }
 
+        # add new fields to apus object
         self$fields <- rbindlist(list(self$fields, field))
       }
 
@@ -119,7 +134,7 @@ Apus <- R6::R6Class(
     },
 
     #' @description
-    #' Train a model
+    #' Train a model to
     #'
     #' @param width (integer)
     #' @param layers (integer)
@@ -150,14 +165,29 @@ Apus <- R6::R6Class(
       self$device <- device
 
       # Create an Apus dataset --------------------------------------------------
-      dataset.train <- createApusDataset(farms = NULL, cultivation = self$cultivation, fertilizers = self$fertilizers, fields_max = self$fields_max, device = device)
+      dataset.train <- createApusDataset(farms = NULL,
+                                         cultivation = self$cultivation,
+                                         fertilizers = self$fertilizers,
+                                         fields_max = self$fields_max,
+                                         device = device)
 
-      farms.valid <- createSyntheticFarms(farms_count = 1000, fields_max = self$fields_max)
-      dataset.valid <- createApusDataset(farms = farms.valid, cultivation = self$cultivation, fertilizers = self$fertilizers, fields_max = self$fields_max, device = device)
+      farms.valid <- createSyntheticFarms(farms_count = 1000,
+                                          fields_max = self$fields_max)
+
+      dataset.valid <- createApusDataset(farms = farms.valid,
+                                         cultivation = self$cultivation,
+                                         fertilizers = self$fertilizers,
+                                         fields_max = self$fields_max,
+                                         device = device)
 
 
       # Create an Apus model ----------------------------------------------------------
-      model <- createApusModel(dataset.train, dataset.valid, width = width, layers = layers, epochs = epochs, device = device)
+      model <- createApusModel(dataset.train,
+                               dataset.valid,
+                               width = width,
+                               layers = layers,
+                               epochs = epochs,
+                               device = device)
 
       self$model <- model
 
