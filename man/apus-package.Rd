@@ -6,7 +6,7 @@
 \alias{apus-package}
 \title{apus: Advises an optimal fertilizer mix for a farm}
 \description{
-apus optimizes the fertilizer mix for a farm based on the nutrient requirements, legal norms, cultivation response curves, available fertilizers and tries to archieve the best economic result within the provided boundaries.
+apus optimizes the fertilizer mix (type and dose) for a farm based on the agronomic nutrient requirements, legal norms, crop-dose response curves, available fertilizers in order to find the best economic result within the provided agronomic and environmental boundaries.
 }
 \seealso{
 Useful links:
@@ -18,6 +18,11 @@ Useful links:
 }
 \author{
 \strong{Maintainer}: Sven Verweij \email{sven.verweij@nmi-agro.nl} (\href{https://orcid.org/0000-0002-5573-3952}{ORCID})
+
+Authors:
+\itemize{
+  \item Gerard Ros \email{gerard.ros@nmi-agro.nl}
+}
 
 Other contributors:
 \itemize{

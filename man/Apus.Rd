@@ -72,7 +72,9 @@ Add a field to the apus object
   d_k_req = NA,
   d_n_norm = NA,
   d_n_norm_man = NA,
-  d_p_norm = NA
+  d_p_norm = NA,
+  b_lu_yield = NA,
+  b_lu_price = NA
 )}\if{html}{\out{</div>}}
 }
 
@@ -81,21 +83,25 @@ Add a field to the apus object
 \describe{
 \item{\code{b_id_field}}{(character) ID or (unique) name of the field}
 
-\item{\code{b_area}}{(number) The area of the field (m^2)}
+\item{\code{b_area}}{(number) The area of the field (ha)}
 
 \item{\code{b_lu}}{(character) The cultivation code for this field}
 
-\item{\code{d_n_req}}{(number) The required amount of Nitrogen for this field (kg N / ha)}
+\item{\code{d_n_req}}{(number) The required amount of Nitrogen for this field (kg N / ha / year)}
 
-\item{\code{d_p_req}}{(number) The required amount of Phosphate for this field (kg P2O5 / ha)}
+\item{\code{d_p_req}}{(number) The required amount of Phosphate for this field (kg P2O5 / ha / year)}
 
-\item{\code{d_k_req}}{(number) The required amount of Potassium for this field (kg K2O / ha)}
+\item{\code{d_k_req}}{(number) The required amount of Potassium for this field (kg K2O / ha / year)}
 
-\item{\code{d_n_norm}}{(number) The legal limit for workable Nitrogen (kg N / ha)}
+\item{\code{d_n_norm}}{(number) The legal limit for workable Nitrogen (kg N / ha / year)}
 
-\item{\code{d_n_norm_man}}{(number) The legal limit for total Nitrogen from manure (kg N / ha}
+\item{\code{d_n_norm_man}}{(number) The legal limit for total Nitrogen from manure (kg N / ha / year)}
 
-\item{\code{d_p_norm}}{(number) The legal limit for Phosphate (kg P2O5 / ha)}
+\item{\code{d_p_norm}}{(number) The legal limit for Phosphate (kg P2O5 / ha / year)}
+
+\item{\code{b_lu_yield}}{(number) Expected harvest (kg  dry matter/ ha)}
+
+\item{\code{b_lu_price}}{(number) Expected price for harvest (€/ kg)}
 }
 \if{html}{\out{</div>}}
 }
@@ -104,7 +110,7 @@ Add a field to the apus object
 \if{html}{\out{<a id="method-Apus-trainModel"></a>}}
 \if{latex}{\out{\hypertarget{method-Apus-trainModel}{}}}
 \subsection{Method \code{trainModel()}}{
-Train a model
+Train a model to
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Apus$trainModel(width = 12, layers = 1, epochs = 3, device = "cpu")}\if{html}{\out{</div>}}
 }
