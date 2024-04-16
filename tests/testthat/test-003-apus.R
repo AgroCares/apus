@@ -96,12 +96,12 @@ test_that("Second field is added", {
 field3 <- data.frame(
   b_id_field = 3L,
   b_area = 5000,
-  b_lu = 'nl_366',
+  b_lu = 'nl_372',
   d_n_req = 370,
   d_p_req = 130,
   d_k_req = 50,
   d_n_norm = 330,
-  d_n_norm_man = 300,
+  d_n_norm_man = 200,
   d_p_norm = 80
 )
 

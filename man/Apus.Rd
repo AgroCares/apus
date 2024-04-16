@@ -81,7 +81,7 @@ Add a field to the apus object
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{b_id_field}}{(character) ID or (unique) name of the field}
+\item{\code{b_id_field}}{(integer) ID of the field}
 
 \item{\code{b_area}}{(number) The area of the field (ha)}
 

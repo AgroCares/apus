@@ -67,7 +67,7 @@ Apus <- R6::R6Class(
     #' @description
     #' Add a field to the apus object
     #'
-    #' @param b_id_field (character) ID or (unique) name of the field
+    #' @param b_id_field (integer) ID of the field
     #' @param b_area (number) The area of the field (ha)
     #' @param b_lu (character) The cultivation code for this field
     #' @param d_n_req (number) The required amount of Nitrogen for this field (kg N / ha / year)
@@ -83,8 +83,8 @@ Apus <- R6::R6Class(
     addField = function(b_id_field, b_area, b_lu, d_n_req = NA, d_p_req = NA, d_k_req = NA, d_n_norm = NA, d_n_norm_man = NA, d_p_norm = NA, b_lu_yield = NA, b_lu_price = NA) {
 
       # Check arguments ---------------------------------------------------------
-      checkmate::assert_character(b_id_field,len = 1)
-      checkmate::assert_numeric(b_area,lower = 0, upper = 100)
+      checkmate::assert_integerish(b_id_field,len = 1)
+      checkmate::assert_numeric(b_area,lower = 0, upper = 50000)
       checkmate::assert_subset(b_lu,choices = apus::cultivations$b_lu)
       checkmate::assert_numeric(d_n_req,lower = 0, upper = 400)
       checkmate::assert_numeric(d_p_req,lower = 0, upper = 150)

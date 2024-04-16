@@ -43,7 +43,7 @@ apus$addField(
 
 # Add a second field
 apus$addField(
-  b_id_field = 1L,
+  b_id_field = 2L,
   b_area = 5000,
   b_lu = 'nl_262',
   d_n_req = 270,
