@@ -136,9 +136,6 @@ createApusModel <- function(dataset.train, dataset.valid, width = 12, layers = 1
       # For developing
       # b <- dl.valid$.iter()
       # b <- b$.next()
-      fields <- b$fields
-      fertilizers <- b$fertilizers
-      fines <- b$fines
 
       # Forward pass
       doses <- model(b$fields, b$fertilizers)
