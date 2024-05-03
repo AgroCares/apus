@@ -36,18 +36,18 @@ test_that("Calculate cost for module 1: Purchase of fertilizers", {
   expect_length(as.numeric(module1), farms_count)
 })
 
-module4 <- calculateRevenueModule4(doses, fields, fertilizers)
+module5 <- calculateRevenueModule5(doses, fields, fertilizers)
 
-test_that("Calculate revenue for module 4: Revenue of harvested crops", {
-  expect_contains(class(module4), 'torch_tensor')
-  expect_length(as.numeric(module4), farms_count)
-})
-
-module5 <- calculatePenaltyModule5(doses, fields, fertilizers, fines)
-
-test_that("Calculate penalties for module 5: Penalties for exceeding legal limits", {
+test_that("Calculate revenue for module 5: Revenue of harvested crops", {
   expect_contains(class(module5), 'torch_tensor')
   expect_length(as.numeric(module5), farms_count)
+})
+
+module6 <- calculatePenaltyModule6(doses, fields, fertilizers, fines)
+
+test_that("Calculate penalties for module 6: Penalties for exceeding legal limits", {
+  expect_contains(class(module6), 'torch_tensor')
+  expect_length(as.numeric(module6), farms_count)
 })
 
 cost <- calculateCost(doses, fields, fertilizers, fines)

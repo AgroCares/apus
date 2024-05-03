@@ -171,16 +171,16 @@ calculateCost <- function(doses, fields, fertilizers, fines, reduce_batches = TR
   module1 <- calculateCostModule1(doses, fields, fertilizers)
 
 
-  # Module 4: Revenue from harvested crops ----------------------------------
-  module4 <- calculateRevenueModule4(doses, fields, fertilizers)
+  # Module 5: Revenue from harvested crops ----------------------------------
+  module5 <- calculateRevenueModule5(doses, fields, fertilizers)
 
 
-  # Module 5: Penalty for exceeding legal limit -----------------------------
-  module5 <- calculatePenaltyModule5(doses, fields, fertilizers, fines)
+  # Module 6: Penalty for exceeding legal limit -----------------------------
+  module6 <- calculatePenaltyModule6(doses, fields, fertilizers, fines)
 
 
   # Combine the modules -----------------------------------------------------
-  cost <- torch::torch_zeros(dim(module1)) + module1 - module4 + module5
+  cost <- torch::torch_zeros(dim(module1)) + module1 - module5 + module6
 
 
   # Convert to € / ha -------------------------------------------------------
@@ -218,8 +218,8 @@ calculateCostModule1 <- function(doses, fields, fertilizers) {
   return(module1)
 }
 
-# Module 4: Revenue from harvested crops  ------------------------------------
-calculateRevenueModule4 <- function(doses, fields, fertilizers) {
+# Module 5: Revenue from harvested crops  ------------------------------------
+calculateRevenueModule5 <- function(doses, fields, fertilizers) {
 
   # Calculate N dose per fields
   fertilizers.p_n_rt <- fertilizers[,,3]
@@ -275,14 +275,14 @@ calculateRevenueModule4 <- function(doses, fields, fertilizers) {
   fields.b_area <- fields[,,1]
   fields.b_lu_yield <- fields[,,8]
   fields.b_lu_price <- fields[,,9]
-  module4 <- fields.b_area *  fields.b_lu_yield * fields.b_lu_price * fields.d_realized
-  module4 <- torch::torch_sum(module4, dim = 2L)
+  module5 <- fields.b_area *  fields.b_lu_yield * fields.b_lu_price * fields.d_realized
+  module5 <- torch::torch_sum(module5, dim = 2L)
 
-  return(module4)
+  return(module5)
 }
 
-# Module 5: Penalties in case of exceeding legal limits -----------------------
-calculatePenaltyModule5 <- function(doses, fields, fertilizers, fines) {
+# Module 6: Penalties in case of exceeding legal limits -----------------------
+calculatePenaltyModule6 <- function(doses, fields, fertilizers, fines) {
 
   # Calculate d_n_norm_man per field
   fertilizers.p_n_rt <- fertilizers[,,3]
@@ -337,9 +337,9 @@ calculatePenaltyModule5 <- function(doses, fields, fertilizers, fines) {
 
 
   # Combine the penalties
-  module5 <- farms.penalty.d_n_norm_man + farms.penalty.d_n_norm + farms.penalty.d_p_norm
+  module6 <- farms.penalty.d_n_norm_man + farms.penalty.d_n_norm + farms.penalty.d_p_norm
 
-  return(module5)
+  return(module6)
 }
 
 
