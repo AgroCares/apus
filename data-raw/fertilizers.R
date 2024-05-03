@@ -19,6 +19,9 @@ fertilizers[p_type_compost == TRUE, p_p_wcl := 0.25]
 fertilizers[p_name_nl == 'Champost', p_p_wcl := 0.75]
 fertilizers[p_name_nl == 'Rundvee vaste mest', p_p_wcl := 0.75]
 
+fertilizers[, p_app_cost := 100]
+fertilizers[, p_app_capacity := 15000]
+fertilizers[p_type_artificial ==TRUE, p_app_capacity := 1000]
 
 # Export table ------------------------------------------------------------
 usethis::use_data(fertilizers, overwrite = TRUE, version = 3, compress = 'xz')
