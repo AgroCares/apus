@@ -49,9 +49,8 @@ createApusDataset <- function(farms = NULL, cultivations, fertilizers, fines, fi
       fines <- dcast(fines, . ~ norm, value.var = 'fine')[, 2:4]
       self$fines <- torch::torch_tensor(as.matrix(fines), device = device)
 
-      fertilizers <- fertilizers[, c('p_stored', 'p_price', 'p_n_rt', 'p_n_wc', 'p_p_rt', 'p_k_rt', 'p_type_manure', 'p_p_wcl')]
+      fertilizers <- fertilizers[, c('p_stored', 'p_price', 'p_n_rt', 'p_n_wc', 'p_p_rt', 'p_k_rt', 'p_type_manure', 'p_p_wcl', 'p_storage_cost', 'p_storage_capacity', 'p_storage_available')]
       self$fertilizers <- torch::torch_tensor(as.matrix(fertilizers), device = device)
-
     },
 
     .getitem = function(index) {

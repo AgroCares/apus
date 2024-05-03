@@ -30,7 +30,7 @@ test_that("Create validation/test dataset", {
 
   expect_contains(class(batch$fields), 'torch_tensor')
   expect_equal(dim(batch$fields), c(farms_count, fields_max, 9))
-  expect_equal(dim(batch$fertilizers), c(farms_count, nrow(apus::fertilizers), 8))
+  expect_equal(dim(batch$fertilizers), c(farms_count, nrow(apus::fertilizers), 11))
 })
 
 

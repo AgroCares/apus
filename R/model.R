@@ -168,6 +168,10 @@ calculateCost <- function(doses, fields, fertilizers, fines, reduce_batches = TR
   module1 <- calculateCostModule1(doses, fields, fertilizers)
 
 
+  # Module 3: Cost of storing fertilizers -----------------------------------
+  module3 <- calculateCostModule3(doses, fields, fertilizers)
+
+
   # Module 5: Revenue from harvested crops ----------------------------------
   module5 <- calculateRevenueModule5(doses, fields, fertilizers)
 
@@ -177,7 +181,7 @@ calculateCost <- function(doses, fields, fertilizers, fines, reduce_batches = TR
 
 
   # Combine the modules -----------------------------------------------------
-  cost <- torch::torch_zeros(dim(module1)) + module1 - module5 + module6
+  cost <- torch::torch_zeros(dim(module1)) + module1 + module3 - module5 + module6
 
 
   # Convert to € / ha -------------------------------------------------------
@@ -213,6 +217,29 @@ calculateCostModule1 <- function(doses, fields, fertilizers) {
 
 
   return(module1)
+}
+
+# Module 3: Cost of storing fertilizers -------------------------------------
+calculateCostModule3 <- function(doses, fields, fertilizers) {
+
+  # Sum dose per fertilizer -------------------------------------------------
+  fields.b_area <- torch::torch_unsqueeze(fields[,,1], -1)
+  fields.dose <- fields.b_area * doses
+  fertilizers.dose <- torch::torch_sum(doses, dim = 2L)
+
+
+  # Calculate requires storage places for fertilizer ------------------------
+  fertilizers.storage_capacity <- fertilizers[,,10]
+  fertilizers.storage_cost <- fertilizers[,,9]
+  fertilizers.storage_available <- fertilizers[,,11]
+  fertilizers.storages <- torch::torch_ceil(fertilizers.dose / fertilizers.storage_capacity)
+  fertilizers.cost <- (fertilizers.storages - fertilizers.storage_available) * fertilizers.storage_cost
+
+
+  # Sum cost for farm -------------------------------------------------------
+  module3 <- torch::torch_sum(fertilizers.cost, dim = 2L)
+
+  return(module3)
 }
 
 # Module 5: Revenue from harvested crops  ------------------------------------
