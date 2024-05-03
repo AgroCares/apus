@@ -35,6 +35,7 @@ A farm needs to have fields, fertilizer etc
 \itemize{
 \item \href{#method-Apus-new}{\code{Apus$new()}}
 \item \href{#method-Apus-addField}{\code{Apus$addField()}}
+\item \href{#method-Apus-updateFertilizer}{\code{Apus$updateFertilizer()}}
 \item \href{#method-Apus-trainModel}{\code{Apus$trainModel()}}
 \item \href{#method-Apus-optimizeFertilizerChoice}{\code{Apus$optimizeFertilizerChoice()}}
 \item \href{#method-Apus-clone}{\code{Apus$clone()}}
@@ -102,6 +103,34 @@ Add a field to the apus object
 \item{\code{b_lu_yield}}{(number) Expected harvest (kg  dry matter/ ha)}
 
 \item{\code{b_lu_price}}{(number) Expected price for harvest (€/ kg)}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Apus-updateFertilizer"></a>}}
+\if{latex}{\out{\hypertarget{method-Apus-updateFertilizer}{}}}
+\subsection{Method \code{updateFertilizer()}}{
+Update a fertilizer
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Apus$updateFertilizer(
+  p_id,
+  p_price = NA_real_,
+  p_stored = NA_real_,
+  p_storage_available = NA_real_
+)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{p_id}}{(character) ID of the fertilizer}
+
+\item{\code{p_price}}{(number)}
+
+\item{\code{p_stored}}{(number)}
+
+\item{\code{p_storage_available}}{(number)}
 }
 \if{html}{\out{</div>}}
 }

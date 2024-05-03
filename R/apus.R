@@ -134,6 +134,48 @@ Apus <- R6::R6Class(
     },
 
     #' @description
+    #' Update a fertilizer
+    #'
+    #' @param p_id (character) ID of the fertilizer
+    #' @param p_price (number)
+    #' @param p_stored (number)
+    #' @param p_storage_available (number)
+    #'
+    #' @export
+    updateFertilizer = function(p_id, p_price = NA_real_, p_stored = NA_real_, p_storage_available = NA_real_) {
+
+      # Check arguments ---------------------------------------------------------
+      #TODO
+
+      # update the fertilizers table with data for that fertilizer --------------
+      fertilizers.new <- self$fertilizers
+      p_id.new <- p_id
+
+      # Update price
+      if(! is.na(p_price)) {
+        p_price.new <- p_price
+        fertilizers.new[p_id == p_id.new, p_price := p_price.new]
+      }
+
+      # Update stored amount of fertilizer
+      if(! is.na(p_stored)) {
+        p_stored.new <- p_stored
+        fertilizers.new[p_id == p_id.new, p_stored := p_stored.new]
+      }
+
+      # Update available storages for fertilizer
+      if(! is.na(p_storage_available)) {
+        p_storage_available.new <- p_storage_available
+        fertilizers.new[p_id == p_id.new, p_storage_available := p_storage_available.new]
+      }
+
+      # Return back updated fertilizer
+      self$fertilizers <- fertilizers.new
+
+      return(TRUE)
+    },
+
+    #' @description
     #' Train a model to
     #'
     #' @param width (integer)
@@ -168,6 +210,7 @@ Apus <- R6::R6Class(
       dataset.train <- createApusDataset(farms = NULL,
                                          cultivation = self$cultivation,
                                          fertilizers = self$fertilizers,
+                                         fines = self$fines,
                                          fields_max = self$fields_max,
                                          device = device)
 
@@ -177,6 +220,7 @@ Apus <- R6::R6Class(
       dataset.valid <- createApusDataset(farms = farms.valid,
                                          cultivation = self$cultivation,
                                          fertilizers = self$fertilizers,
+                                         fines = self$fines,
                                          fields_max = self$fields_max,
                                          device = device)
 
@@ -217,7 +261,7 @@ Apus <- R6::R6Class(
         fields[is.na(fields)] <- 0
       }
 
-      dataset <- createApusDataset(farms = fields, cultivations = self$cultivations, fertilizers = self$fertilizers, fields_max = self$fields_max, device = self$device)
+      dataset <- createApusDataset(farms = fields, cultivations = self$cultivations, fertilizers = self$fertilizers, fines = self$fines, fields_max = self$fields_max, device = self$device)
       dl <- torch::dataloader(dataset, batch_size = 1)
 
 
