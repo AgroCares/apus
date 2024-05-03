@@ -78,7 +78,7 @@ For the v1 version of `apus` we plan to develop to following features:
 * [x] Include cost function for module 1: Purchase of fertilizers
 * [ ] Include cost function for module 2: Disposal of manure
 * [ ] Include cost function for module 3: Cost of storing fertilizers
-* [ ] Include cost function for module 4: Cost of applying fertilizers
+* [x] Include cost function for module 4: Cost of applying fertilizers
 * [x] Include cost function for module 5: Revenue of harvest
 * [x] Include cost function for module 6: Penalties in case of exceeding legal limits
 * [ ] Include cost function for module 7: Cost of greenhouse gas emissions

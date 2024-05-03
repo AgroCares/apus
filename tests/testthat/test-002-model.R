@@ -36,6 +36,14 @@ test_that("Calculate cost for module 1: Purchase of fertilizers", {
   expect_length(as.numeric(module1), farms_count)
 })
 
+
+module4 <- calculateCostModule4(doses, fields, fertilizers)
+
+test_that("Calculate cost for module 4: Cost of applying fertilizers", {
+  expect_contains(class(module4), 'torch_tensor')
+  expect_length(as.numeric(module4), farms_count)
+})
+
 module5 <- calculateRevenueModule5(doses, fields, fertilizers)
 
 test_that("Calculate revenue for module 5: Revenue of harvested crops", {

@@ -53,7 +53,7 @@ createApusDataset <- function(farms = NULL, cultivations, fertilizers, fines, fi
       fertilizers[, p_stored := 0]
       fertilizers[, p_price := 1]
 
-      fertilizers <- fertilizers[, c('p_stored', 'p_price', 'p_n_rt', 'p_n_wc', 'p_p_rt', 'p_k_rt', 'p_type_manure', 'p_p_wcl')]
+      fertilizers <- fertilizers[, c('p_stored', 'p_price', 'p_n_rt', 'p_n_wc', 'p_p_rt', 'p_k_rt', 'p_type_manure', 'p_p_wcl', 'p_app_cost', 'p_app_capacity')]
 
       self$fertilizers <- torch::torch_tensor(as.matrix(fertilizers), device = device)
     },

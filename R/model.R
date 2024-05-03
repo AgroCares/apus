@@ -168,6 +168,10 @@ calculateCost <- function(doses, fields, fertilizers, fines, reduce_batches = TR
   module1 <- calculateCostModule1(doses, fields, fertilizers)
 
 
+  # Module 4: Cost of applying fertilizers ----------------------------------
+  module4 <- calculateCostModule4(doses, fields, fertilizers)
+
+
   # Module 5: Revenue from harvested crops ----------------------------------
   module5 <- calculateRevenueModule5(doses, fields, fertilizers)
 
@@ -177,7 +181,7 @@ calculateCost <- function(doses, fields, fertilizers, fines, reduce_batches = TR
 
 
   # Combine the modules -----------------------------------------------------
-  cost <- torch::torch_zeros(dim(module1)) + module1 - module5 + module6
+  cost <- torch::torch_zeros(dim(module1)) + module1 + module4 - module5 + module6
 
 
   # Convert to € / ha -------------------------------------------------------
@@ -213,6 +217,35 @@ calculateCostModule1 <- function(doses, fields, fertilizers) {
 
 
   return(module1)
+}
+
+# Module 4: Cost of applying fertilizers  -----------------------------------
+calculateCostModule4 <- function(doses, fields, fertilizers) {
+
+  # Sum dose per fertilizer  per field --------------------------------------
+  fields.b_area <- torch::torch_unsqueeze(fields[,,1], -1)
+  fields.fertilizers.dose <- fields.b_area * doses
+
+
+  # Calculate number of applications per field ------------------------------
+  fertilizers.p_app_capacity <- fertilizers[,,10]
+  fields.fertilizers.p_app_capacity <- torch::torch_unsqueeze(fertilizers.p_app_capacity, 2)
+  fields.fertilizers.p_app_capacity <- torch::torch_repeat_interleave(fields.fertilizers.p_app_capacity, repeats = dim(fields.fertilizers.dose)[2], dim =2)
+  fields.fertilizers.applications <- torch::torch_ceil(fields.fertilizers.dose / fields.fertilizers.p_app_capacity)
+
+
+  # Calculate cost of applications -------------------------------------------
+  fertilizers.p_app_cost <- fertilizers[,,9]
+  fields.fertilizers.p_app_cost <- torch::torch_unsqueeze(fertilizers.p_app_cost, 2)
+  fields.fertilizers.p_app_cost <- torch::torch_repeat_interleave(fields.fertilizers.p_app_cost, repeats = dim(fields.fertilizers.dose)[2], dim =2)
+  fields.fertilizers.cost <- fields.fertilizers.applications * fields.fertilizers.p_app_cost
+
+
+  # Sum cost for farm -------------------------------------------------------
+  fields.cost <- torch::torch_sum(fields.fertilizers.cost, dim = 3L)
+  module4 <- torch::torch_sum(fields.cost, dim = 2L)
+
+  return(module4)
 }
 
 # Module 5: Revenue from harvested crops  ------------------------------------
