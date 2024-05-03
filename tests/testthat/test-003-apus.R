@@ -132,6 +132,23 @@ test_that("Third field is added", {
 })
 
 
+# Update a fertilizer -----------------------------------------------------
+
+apus$updateFertilizer(
+  p_id = 17,
+  p_price = -5,
+  p_stored = 15000,
+  p_storage_available = 1
+)
+
+test_that("Fertilizer is updated", {
+  expect_contains(class(apus$fertilizers), 'data.table')
+  expect_equal(nrow(apus$fertilizers), nrow(apus::fertilizers))
+  expect_equal(apus$fertilizers[p_id == 17]$p_price, -5)
+  expect_equal(apus$fertilizers[p_id == 17]$p_stored, 15000)
+  expect_equal(apus$fertilizers[p_id == 17]$p_storage_available, 1)
+})
+
 # Train a model -----------------------------------------------------------
 
 apus$trainModel()

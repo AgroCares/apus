@@ -5,7 +5,7 @@
 \alias{fertilizers}
 \title{Fertilizers table}
 \format{
-An object of class \code{data.table} (inherits from \code{data.frame}) with 47 rows and 46 columns.
+An object of class \code{data.table} (inherits from \code{data.frame}) with 47 rows and 52 columns.
 }
 \usage{
 fertilizers
