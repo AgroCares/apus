@@ -57,6 +57,17 @@ apus$addField(
 )
 ```
 
+To update a fertilizer with specific values for your situation use the `updateFertilizer` function
+
+```
+apus$updateFertilizer(
+  p_id = 17,
+  p_price = -5,
+  p_stored = 15000,
+  p_storage_available = 1
+)
+```
+
 To get a fertilizer advice you need a model first. A model can be trained with with the function `trainModel()`
 
 `apus$trainModel()` 
@@ -84,6 +95,7 @@ For the v1 version of `apus` we plan to develop to following features:
 * [ ] Include cost function for module 7: Cost of greenhouse gas emissions
 * [ ] Include realistic cultivation response curves from module 5
 * [ ] Add other nutrients than NPK to module 5
+* [x] Add function to update fertilizer properties
 * [ ] Add custom fertilizers
 * [ ] Add custom cultivations
 * [ ] Add details of the optimization to the result
