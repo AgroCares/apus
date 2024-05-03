@@ -168,6 +168,7 @@ Apus <- R6::R6Class(
       dataset.train <- createApusDataset(farms = NULL,
                                          cultivation = self$cultivation,
                                          fertilizers = self$fertilizers,
+                                         fines = self$fines,
                                          fields_max = self$fields_max,
                                          device = device)
 
@@ -177,6 +178,7 @@ Apus <- R6::R6Class(
       dataset.valid <- createApusDataset(farms = farms.valid,
                                          cultivation = self$cultivation,
                                          fertilizers = self$fertilizers,
+                                         fines = self$fines,
                                          fields_max = self$fields_max,
                                          device = device)
 
@@ -217,7 +219,7 @@ Apus <- R6::R6Class(
         fields[is.na(fields)] <- 0
       }
 
-      dataset <- createApusDataset(farms = fields, cultivations = self$cultivations, fertilizers = self$fertilizers, fields_max = self$fields_max, device = self$device)
+      dataset <- createApusDataset(farms = fields, cultivations = self$cultivations, fertilizers = self$fertilizers, fines = self$fines, fields_max = self$fields_max, device = self$device)
       dl <- torch::dataloader(dataset, batch_size = 1)
 
 
