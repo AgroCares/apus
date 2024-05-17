@@ -83,8 +83,7 @@ createApusDataset <- function(farms = NULL, cultivations, fertilizers, fields_ma
 transformFieldsToTensor = function(fields, device) {
 
   # Select only relevant columns and define column order --------------------
-  col.fields <- c('b_area', 'd_n_req', 'd_p_req', 'd_k_req', 'd_n_norm', 'd_n_norm_man', 'd_p_norm', 'b_lu_yield', 'b_lu_price')
-  fields <- fields[, mget(col.fields)]
+  fields <- fields[, mget(apus::cols.fields)]
 
 
   # Create torch_tensor from array ------------------------------------------

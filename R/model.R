@@ -224,7 +224,7 @@ calculateRevenueModule4 <- function(doses, fields, fertilizers) {
   fields.dose.n_workable <- torch::torch_sum(fields.fertilizers.dose.n_workable, dim = 3)
 
   # Calculate N requirement realization
-  fields.d_n_req <- fields[,,2]
+  fields.d_n_req <- fields[,,which(apus::cols.fields == 'd_n_req')]
   fields.d_n_gap <- fields.d_n_req - fields.dose.n_workable
   fields.d_n_gap <- torch::torch_relu(fields.d_n_gap)
   fields.d_n_realized <- torch::torch_ones(dim(fields.d_n_gap)) - (fields.d_n_gap / fields.d_n_req)
@@ -239,7 +239,7 @@ calculateRevenueModule4 <- function(doses, fields, fertilizers) {
   fields.dose.p <- torch::torch_sum(fields.fertilizers.dose.p, dim = 3)
 
   # Calculate P requirement realization
-  fields.d_p_req <- fields[,,3]
+  fields.d_p_req <- fields[,,which(apus::cols.fields == 'd_p_req')]
   fields.d_p_gap <- fields.d_p_req - fields.dose.p
   fields.d_p_gap <- torch::torch_relu(fields.d_p_gap)
   fields.d_p_realized <- torch::torch_ones(dim(fields.d_p_gap)) - (fields.d_p_gap / fields.d_p_req)
@@ -254,7 +254,7 @@ calculateRevenueModule4 <- function(doses, fields, fertilizers) {
   fields.dose.k <- torch::torch_sum(fields.fertilizers.dose.k, dim = 3)
 
   # Calculate K requirement realization
-  fields.d_k_req <- fields[,,4]
+  fields.d_k_req <- fields[,,which(apus::cols.fields == 'd_k_req')]
   fields.d_k_gap <- fields.d_k_req - fields.dose.k
   fields.d_k_gap <- torch::torch_relu(fields.d_k_gap)
   fields.d_k_realized <- torch::torch_ones(dim(fields.d_k_gap)) - (fields.d_k_gap / fields.d_k_req)
@@ -265,9 +265,9 @@ calculateRevenueModule4 <- function(doses, fields, fertilizers) {
   fields.d_realized <- torch::torch_cat(list(fields.d_n_realized, fields.d_p_realized, fields.d_k_realized), dim=3L)
   fields.d_realized <- torch::torch_mean(fields.d_realized, dim = 3, keepdim = TRUE) # TODO This should be converted to minimum
   fields.d_realized <- torch::torch_squeeze(fields.d_realized, dim = -1)
-  fields.b_area <- fields[,,1]
-  fields.b_lu_yield <- fields[,,8]
-  fields.b_lu_price <- fields[,,9]
+  fields.b_area <- fields[,,which(apus::cols.fields == 'b_area')]
+  fields.b_lu_yield <- fields[,,which(apus::cols.fields == 'b_lu_yield')]
+  fields.b_lu_price <- fields[,,which(apus::cols.fields == 'b_lu_price')]
   module4 <- fields.b_area *  fields.b_lu_yield * fields.b_lu_price * fields.d_realized
   module4 <- torch::torch_sum(module4, dim = 2L)
 

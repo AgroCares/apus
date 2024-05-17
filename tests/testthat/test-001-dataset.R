@@ -5,7 +5,7 @@ test_that("Create training dataset", {
   expect_equal(dataset$.length(), dataset$farms_count)
   expect_contains(class(dataset$.getitem(1)$fields), 'torch_tensor')
   expect_setequal(names(dataset$.getitem(1)), c('fields', 'fertilizers'))
-  expect_equal(dim(dataset$.getitem(1)$fields), c(dataset$fields_max, 9))
+  expect_equal(dim(dataset$.getitem(1)$fields), c(dataset$fields_max, length(apus::cols.fields)))
   expect_false(identical(dataset$.getitem(1), dataset$.getitem(2)))
 })
 
@@ -22,14 +22,14 @@ test_that("Create validation/test dataset", {
   expect_equal(dataset.valid$.length(), dataset.valid$farms_count)
   expect_contains(class(dataset.valid$.getitem(1)$fields), 'torch_tensor')
   expect_setequal(names(dataset.valid$.getitem(3)), c('fields', 'fertilizers'))
-  expect_equal(dim(dataset.valid$.getitem(1)$fields), c(fields_max, 9))
+  expect_equal(dim(dataset.valid$.getitem(1)$fields), c(fields_max, length(apus::cols.fields)))
 
   dl <- torch::dataloader(dataset.valid, batch_size = farms_count)
   batch <- dl$.iter()
   batch <- batch$.next()
 
   expect_contains(class(batch$fields), 'torch_tensor')
-  expect_equal(dim(batch$fields), c(farms_count, fields_max, 9))
+  expect_equal(dim(batch$fields), c(farms_count, fields_max, length(apus::cols.fields)))
   expect_equal(dim(batch$fertilizers), c(farms_count, nrow(apus::fertilizers), length(apus::cols.fertilizers)))
 })
 
