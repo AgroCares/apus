@@ -53,8 +53,7 @@ createApusDataset <- function(farms = NULL, cultivations, fertilizers, fines, fi
       fertilizers[, p_stored := 0]
       fertilizers[, p_price := 1]
 
-      fertilizers <- fertilizers[, c('p_stored', 'p_price', 'p_n_rt', 'p_n_wc', 'p_p_rt', 'p_k_rt', 'p_type_manure', 'p_p_wcl')]
-
+      fertilizers <- fertilizers[, mget(apus::cols.fertilizers)]
       self$fertilizers <- torch::torch_tensor(as.matrix(fertilizers), device = device)
     },
 
@@ -86,8 +85,7 @@ createApusDataset <- function(farms = NULL, cultivations, fertilizers, fines, fi
 transformFieldsToTensor = function(fields, device) {
 
   # Select only relevant columns and define column order --------------------
-  col.fields <- c('b_area', 'd_n_req', 'd_p_req', 'd_k_req', 'd_n_norm', 'd_n_norm_man', 'd_p_norm', 'b_lu_yield', 'b_lu_price')
-  fields <- fields[, mget(col.fields)]
+  fields <- fields[, mget(apus::cols.fields)]
 
 
   # Create torch_tensor from array ------------------------------------------
