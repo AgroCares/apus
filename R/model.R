@@ -106,14 +106,14 @@ createApusModel <- function(dataset.train, dataset.valid, width = 12, layers = 1
 
       cli::cli_progress_bar(paste0('Training model [', epoch, '/', epochs, ']'), total = dl.train$.length())
 
-      # For testing
+      # For developing
       # b <- dl.train$.iter()
       # b <- b$.next()
 
       # Forward pass
       optimizer$zero_grad()
       doses <- model(b$fields, b$fertilizers)
-      cost <- calculateCost(doses, b$fields, b$fertilizers)
+      cost <- calculateCost(doses, b$fields, b$fertilizers, b$fines)
 
       # Backward pass
       cost$backward()
@@ -133,13 +133,13 @@ createApusModel <- function(dataset.train, dataset.valid, width = 12, layers = 1
 
       cli::cli_progress_bar(paste0('Validating model [', epoch, '/', epochs, ']'), total = dl.valid$.length())
 
-      # For testing
+      # For developing
       # b <- dl.valid$.iter()
       # b <- b$.next()
 
       # Forward pass
       doses <- model(b$fields, b$fertilizers)
-      cost <- calculateCost(doses, b$fields, b$fertilizers)
+      cost <- calculateCost(doses, b$fields, b$fertilizers, b$fines)
 
       losses.validation <- c(losses.validation, cost$item())
 
@@ -157,7 +157,7 @@ createApusModel <- function(dataset.train, dataset.valid, width = 12, layers = 1
   return(model)
 }
 
-calculateCost <- function(doses, fields, fertilizers, reduce_batches = TRUE) {
+calculateCost <- function(doses, fields, fertilizers, fines, reduce_batches = TRUE) {
 
 
   # Check arguments ---------------------------------------------------------
@@ -168,12 +168,16 @@ calculateCost <- function(doses, fields, fertilizers, reduce_batches = TRUE) {
   module1 <- calculateCostModule1(doses, fields, fertilizers)
 
 
-  # Module 4: Revenue from harvested crops ----------------------------------
-  module4 <- calculateRevenueModule4(doses, fields, fertilizers)
+  # Module 5: Revenue from harvested crops ----------------------------------
+  module5 <- calculateRevenueModule5(doses, fields, fertilizers)
+
+
+  # Module 6: Penalty for exceeding legal limit -----------------------------
+  module6 <- calculatePenaltyModule6(doses, fields, fertilizers, fines)
 
 
   # Combine the modules -----------------------------------------------------
-  cost <- torch::torch_zeros(dim(module1)) + module1 - module4
+  cost <- torch::torch_zeros(dim(module1)) + module1 - module5 + module6
 
 
   # Convert to € / ha -------------------------------------------------------
@@ -211,8 +215,8 @@ calculateCostModule1 <- function(doses, fields, fertilizers) {
   return(module1)
 }
 
-# Module 4: Revenue from harvested crops  ------------------------------------
-calculateRevenueModule4 <- function(doses, fields, fertilizers) {
+# Module 5: Revenue from harvested crops  ------------------------------------
+calculateRevenueModule5 <- function(doses, fields, fertilizers) {
 
   # Calculate N dose per fields
   fertilizers.p_n_rt <- fertilizers[,,3]
@@ -268,9 +272,71 @@ calculateRevenueModule4 <- function(doses, fields, fertilizers) {
   fields.b_area <- fields[,,1]
   fields.b_lu_yield <- fields[,,8]
   fields.b_lu_price <- fields[,,9]
-  module4 <- fields.b_area *  fields.b_lu_yield * fields.b_lu_price * fields.d_realized
-  module4 <- torch::torch_sum(module4, dim = 2L)
+  module5 <- fields.b_area *  fields.b_lu_yield * fields.b_lu_price * fields.d_realized
+  module5 <- torch::torch_sum(module5, dim = 2L)
 
-  return(module4)
+  return(module5)
 }
+
+# Module 6: Penalties in case of exceeding legal limits -----------------------
+calculatePenaltyModule6 <- function(doses, fields, fertilizers, fines) {
+
+  # Calculate d_n_norm_man per field
+  fertilizers.p_n_rt <- fertilizers[,,3]
+  fertilizers.p_type_manure <- fertilizers[,,7]
+  fertilizers.p_n_manure <- fertilizers.p_n_rt * fertilizers.p_type_manure
+  fertilizers.p_n_manure <- torch::torch_unsqueeze(fertilizers.p_n_manure, 2)
+  fertilizers.p_n_manure <- torch::torch_repeat_interleave(fertilizers.p_n_manure, repeats = dim(doses)[2], dim =2)
+  fields.fertilizers.dose.n_manure <- doses * fertilizers.p_n_manure
+  fields.dose.n_manure <- torch::torch_sum(fields.fertilizers.dose.n_manure, dim = 3)
+  farms.dose.n_manure <- torch::torch_sum(fields.dose.n_manure, dim = 2)
+
+  fields.d_n_norm_man <- fields[,,6]
+  fields.b_area <- fields[,,1]
+  fine.d_n_norm_man <- fines[,1,2]
+  farms.d_n_norm_man <- torch::torch_sum(fields.b_area * fields.d_n_norm_man, dim = 2L)
+  farms.exceeding.d_n_norm_man <- torch::torch_relu(farms.dose.n_manure - farms.d_n_norm_man)
+  farms.penalty.d_n_norm_man <- farms.exceeding.d_n_norm_man * fine.d_n_norm_man
+
+  # Calculate d_n_norm per field
+  fertilizers.p_n_rt <- fertilizers[,,3]
+  fertilizers.p_n_wc <- fertilizers[,,4] # TODO Replace with p_n_wcl
+  fertilizers.p_n_workable <- fertilizers.p_n_rt * fertilizers.p_n_wc
+  fertilizers.p_n_workable <- torch::torch_unsqueeze(fertilizers.p_n_workable, 2)
+  fertilizers.p_n_workable <- torch::torch_repeat_interleave(fertilizers.p_n_workable, repeats = dim(doses)[2], dim =2)
+  fields.fertilizers.dose.n_workable <- doses * fertilizers.p_n_workable
+  fields.dose.n_workable <- torch::torch_sum(fields.fertilizers.dose.n_workable, dim = 3)
+  farms.dose.n_workable <- torch::torch_sum(  fields.dose.n_workable , dim = 2)
+
+  fields.d_n_norm <- fields[,,5]
+  fields.b_area <- fields[,,1]
+  fine.d_n_norm <- fines[,1,1]
+  farms.d_n_norm <- torch::torch_sum(fields.b_area * fields.d_n_norm, dim = 2L)
+  farms.exceeding.d_n_norm <- torch::torch_relu(farms.dose.n_workable - farms.d_n_norm)
+  farms.penalty.d_n_norm <- farms.exceeding.d_n_norm * fine.d_n_norm
+
+  # Calculate d_p_norm per field
+  fertilizers.p_p_rt <- fertilizers[,,5]
+  fertilizers.p_p_wcl <- fertilizers[,,8]
+  fertilizers.p_p_legal <- fertilizers.p_p_rt * fertilizers.p_p_wcl
+  fertilizers.p_p_legal <- torch::torch_unsqueeze(fertilizers.p_p_legal, 2)
+  fertilizers.p_p_legal <- torch::torch_repeat_interleave(fertilizers.p_p_legal, repeats = dim(doses)[2], dim =2)
+  fields.fertilizers.dose.p_legal <- doses * fertilizers.p_p_legal
+  fields.dose.p_legal <- torch::torch_sum(fields.fertilizers.dose.p_legal, dim = 3)
+  farms.dose.p_legal <- torch::torch_sum(  fields.dose.p_legal, dim = 2)
+
+  fields.d_p_norm <- fields[,,7]
+  fields.b_area <- fields[,,1]
+  fine.d_p_norm <- fines[,1,3]
+  farms.d_p_norm <- torch::torch_sum(fields.b_area * fields.d_p_norm, dim = 2L)
+  farms.exceeding.d_p_norm <- torch::torch_relu(farms.dose.p_legal - farms.d_p_norm)
+  farms.penalty.d_p_norm <- farms.exceeding.d_p_norm * fine.d_p_norm
+
+
+  # Combine the penalties
+  module6 <- farms.penalty.d_n_norm_man + farms.penalty.d_n_norm + farms.penalty.d_p_norm
+
+  return(module6)
+}
+
 

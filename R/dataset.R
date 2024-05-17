@@ -6,6 +6,7 @@
 #' @param farms (data.table)
 #' @param cultivations (data.table)
 #' @param fertilizers (data.table)
+#' @param fines (data.table)
 #' @param fields_max (integer)
 #' @param device (character)
 #'
@@ -15,7 +16,7 @@
 #' @import torch
 #'
 #'@export
-createApusDataset <- function(farms = NULL, cultivations, fertilizers, fields_max, device) {
+createApusDataset <- function(farms = NULL, cultivations, fertilizers, fines, fields_max, device) {
 
   transformfieldsToTensor = createSyntheticfields = code = fields_count = self = NULL
   size = value_max = value_min = p_price = p_stored = b_id_farm = b_id_field = NULL
@@ -27,7 +28,7 @@ createApusDataset <- function(farms = NULL, cultivations, fertilizers, fields_ma
   apus_dataset <- torch::dataset(
     name = "apus_dataset",
 
-    initialize = function(farms = NULL, cultivations, fertilizers, fields_max, device) {
+    initialize = function(farms = NULL, cultivations, fertilizers, fines, fields_max, device) {
 
       # Check arguments -----------------------------------------------------
       # TODO
@@ -45,11 +46,14 @@ createApusDataset <- function(farms = NULL, cultivations, fertilizers, fields_ma
         self$farms_count <- 100
       }
 
+      fines <- dcast(fines, . ~ norm, value.var = 'fine')[, 2:4]
+      self$fines <- torch::torch_tensor(as.matrix(fines), device = device)
+
       # Set temporary
       fertilizers[, p_stored := 0]
       fertilizers[, p_price := 1]
 
-      fertilizers <- fertilizers[, c('p_stored', 'p_price', 'p_n_rt', 'p_n_wc', 'p_p_rt', 'p_k_rt')]
+      fertilizers <- fertilizers[, c('p_stored', 'p_price', 'p_n_rt', 'p_n_wc', 'p_p_rt', 'p_k_rt', 'p_type_manure', 'p_p_wcl')]
 
       self$fertilizers <- torch::torch_tensor(as.matrix(fertilizers), device = device)
     },
@@ -63,7 +67,7 @@ createApusDataset <- function(farms = NULL, cultivations, fertilizers, fields_ma
       }
       t.fields <- transformFieldsToTensor(farms, self$device)
 
-      return(list(fields = t.fields, fertilizers = self$fertilizers))
+      return(list(fields = t.fields, fertilizers = self$fertilizers, fines = self$fines))
     },
 
     .length = function() {
@@ -73,7 +77,7 @@ createApusDataset <- function(farms = NULL, cultivations, fertilizers, fields_ma
 
 
   # Create torch dataset for apus -------------------------------------------
-  dataset <- apus_dataset(farms = farms, cultivations = cultivations, fertilizers = fertilizers, fields_max = fields_max, device = device)
+  dataset <- apus_dataset(farms = farms, cultivations = cultivations, fertilizers = fertilizers, fines = fines, fields_max = fields_max, device = device)
 
   return(dataset)
 }
