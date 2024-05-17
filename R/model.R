@@ -215,8 +215,8 @@ calculateCostModule1 <- function(doses, fields, fertilizers) {
 calculateRevenueModule4 <- function(doses, fields, fertilizers) {
 
   # Calculate N dose per fields
-  fertilizers.p_n_rt <- fertilizers[,,3]
-  fertilizers.p_n_wc <- fertilizers[,,4]
+  fertilizers.p_n_rt <- fertilizers[,,which(apus::cols.fertilizers == 'p_n_rt')]
+  fertilizers.p_n_wc <- fertilizers[,,which(apus::cols.fertilizers == 'p_n_wc')]
   fertilizers.p_n_workable <- fertilizers.p_n_rt * fertilizers.p_n_wc
   fertilizers.p_n_workable <- torch::torch_unsqueeze(fertilizers.p_n_workable, 2)
   fertilizers.p_n_workable <- torch::torch_repeat_interleave(fertilizers.p_n_workable, repeats = dim(doses)[2], dim =2)
@@ -232,7 +232,7 @@ calculateRevenueModule4 <- function(doses, fields, fertilizers) {
 
 
   # Calculate P dose per fields
-  fertilizers.p_p_rt <- fertilizers[,,5]
+  fertilizers.p_p_rt <- fertilizers[,,which(apus::cols.fertilizers == 'p_p_rt')]
   fertilizers.p_p_rt <- torch::torch_unsqueeze(fertilizers.p_p_rt, 2)
   fertilizers.p_p_rt <- torch::torch_repeat_interleave(fertilizers.p_p_rt, repeats = dim(doses)[2], dim =2)
   fields.fertilizers.dose.p <- doses * fertilizers.p_p_rt
@@ -247,7 +247,7 @@ calculateRevenueModule4 <- function(doses, fields, fertilizers) {
 
 
   # Calculate K dose per fields
-  fertilizers.p_k_rt <- fertilizers[,,6]
+  fertilizers.p_k_rt <- fertilizers[,,which(apus::cols.fertilizers == 'p_k_rt')]
   fertilizers.p_k_rt <- torch::torch_unsqueeze(fertilizers.p_k_rt, 2)
   fertilizers.p_k_rt <- torch::torch_repeat_interleave(fertilizers.p_k_rt, repeats = dim(doses)[2], dim =2)
   fields.fertilizers.dose.k <- doses * fertilizers.p_k_rt
